@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UniTwin - Kampus UPNVJ</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0B1630;--navy2:#16254A;--gold:#B8902F;--gl:#E8D9AE;--ivory:#FAF7F0;--line:#E4DCC8;--tx:#1F2A44;--mu:#6B7385;--ok:#2E8B6E;--off:#9AA3B6;--bad:#C8485E;--am:#D9A441;--use:#1F8FB8}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Poppins',system-ui,Arial,sans-serif;color:var(--tx);background:var(--ivory);display:flex;min-height:100vh;font-size:13px}
+aside{width:228px;background:var(--navy);color:#DDE4F2;padding:20px 14px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;flex:none}
+.logo{font-size:23px;font-weight:700;color:#fff;letter-spacing:.3px;padding:0 8px}.logo b{color:var(--gl)}
+.sub{font-size:10.5px;color:#9FB0D0;padding:2px 8px 18px;line-height:1.4}
+nav button{display:block;width:100%;text-align:left;background:none;border:0;color:#C9D3E8;font:500 13px Poppins,system-ui;padding:11px 12px;border-radius:9px;cursor:pointer;margin-bottom:3px}
+nav button:hover{background:var(--navy2)}nav button.on{background:var(--gold);color:#fff}
+.ctl{margin-top:auto;background:var(--navy2);border-radius:12px;padding:12px;font-size:11px}
+.ctl .t{font-size:20px;font-weight:700;color:#fff}.ctl input{width:100%;accent-color:var(--gold);margin:8px 0}
+.ctl button{background:var(--gold);color:#fff;border:0;border-radius:8px;padding:6px 12px;font:600 11px Poppins;cursor:pointer}
+.demo{font-size:10px;color:#9FB0D0;margin-top:8px;line-height:1.4}
+main{flex:1;padding:22px 28px;min-width:0}
+h1{font-size:20px;margin:0}.lead{color:var(--mu);margin:2px 0 16px;font-size:12px}
+.row{display:grid;gap:14px}.k4{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.card h3{margin:0 0 8px;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gold)}
+.kpi .v{font-size:27px;font-weight:700;color:var(--navy);line-height:1.2}.kpi .l{font-size:11px;color:var(--mu)}.kpi.warn .v{color:var(--bad)}
+.two{display:grid;grid-template-columns:1.8fr 1fr;gap:14px;margin-top:14px}.two.r{grid-template-columns:1fr 1.7fr}
+@media(max-width:1100px){.two,.two.r{grid-template-columns:1fr}}
+svg{display:block;width:100%;height:auto}
+.pill{display:inline-block;padding:2px 9px;border-radius:12px;font-size:10.5px;font-weight:600;color:#fff;white-space:nowrap}
+.ON,.ONLINE,.s-ok{background:var(--ok)}.OFF,.s-off{background:var(--off)}.RUSAK,.OFFLINE,.s-bad,.Tinggi{background:var(--bad)}.Sedang{background:var(--am)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chips button,select{font:500 12px Poppins,system-ui;border:1px solid var(--line);background:#fff;border-radius:18px;padding:6px 14px;cursor:pointer;color:var(--tx)}
+.chips button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+table{width:100%;border-collapse:collapse}th{text-align:left;font-size:10.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--mu);padding:8px;border-bottom:2px solid var(--line)}
+td{padding:8px;border-bottom:1px solid #EFEAD9;vertical-align:top}tr:hover td{background:#FDFBF5}
+a.lnk{color:var(--gold);font-weight:600;cursor:pointer;text-decoration:none}
+.al{padding:9px 10px;border-left:3px solid var(--bad);background:#FBF2F4;border-radius:6px;margin-bottom:8px;font-size:12px}.al.w{border-color:var(--am);background:#FCF6E8}.al.g{border-color:var(--use);background:#EDF6FA}
+.leg{display:flex;flex-wrap:wrap;gap:14px;font-size:11px;color:var(--mu);margin-top:8px}.leg i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.btn{background:var(--navy);color:#fff;border:0;border-radius:8px;padding:7px 14px;font:600 12px Poppins;cursor:pointer}
+.bld{cursor:pointer}.rm{cursor:pointer}
+.flow{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap}.flow div{flex:1;min-width:130px;background:#fff;border:1px solid var(--line);border-top:3px solid var(--gold);border-radius:10px;padding:10px;font-size:11.5px}
+.flow b{display:block;margin-bottom:3px;color:var(--navy)}
+</style>
+</head>
+<body>
+<aside>
+  <div class="logo">Uni<b>Twin</b></div>
+  <div class="sub">Integrasi IoT kampus<br>UPN "Veteran" Jakarta, Kampus Pondok Labu</div>
+  <nav id="nav"></nav>
+  <div class="ctl"><div>Jam simulasi</div><div class="t" id="clk">10:20</div><input type="range" id="sl" min="360" max="1200" step="10" value="620"><button id="pl">Putar</button>
+    <div class="demo">Mode demo: data simulasi. Sambungkan ke CCTV, AC, dan TV kampus lewat gateway UniTwin untuk data nyata.</div></div>
+</aside>
+<main id="m"></main>
+<script>
+/* ===== Model kampus (ilustratif, bukan denah resmi) ===== */
+const FAC=[['FIK','Fakultas Ilmu Komputer',['Basis Data','Sistem Operasi','Jaringan Komputer','Transformasi Digital','Pemrograman Web','Kecerdasan Buatan'],60,70],
+['FEB','Fakultas Ekonomi dan Bisnis',['Akuntansi Biaya','Manajemen Keuangan','Ekonomi Makro','Pemasaran','Perpajakan'],330,70],
+['FISIP','Fakultas Ilmu Sosial dan Ilmu Politik',['Teori Politik','Komunikasi Massa','Sosiologi','Hubungan Internasional'],600,70],
+['FH','Fakultas Hukum',['Hukum Pidana','Hukum Perdata','Hukum Tata Negara','Hukum Bisnis'],60,330],
+['FT','Fakultas Teknik',['Mekanika Teknik','Termodinamika','Elektronika','Teknik Industri'],330,330],
+['FK','Fakultas Kedokteran',['Anatomi','Fisiologi','Biokimia','Histologi'],600,330]];
+const ERR=['E4 sensor suhu','E1 kompresor','F3 tekanan refrigeran','E7 komunikasi unit'],TARIF=1444.7,KW=1.8;
+const h32=s=>{let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0};
+const RN=s=>{let t=(h32(String(s))+0x6D2B79F5)>>>0;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296};
+const RS=[];FAC.forEach(F=>{for(let f=1;f<=4;f++)for(let k=1;k<=8;k++){const id=F[0]+'-'+f+'0'+k,lab=(f===2||f===3)&&k>=7;RS.push({id,fac:F[0],fn:F[1],f,k,type:lab?'Lab':'Kelas',cap:lab?30:40,cs:F[2],acBad:RN(id+'ac')<.06,tvBad:RN(id+'tv')<.05,ccOff:RN(id+'cc')<.02})}});
+let T=620,tick=0,S={},V='peta',B='FIK',FL=3,SEL=null,play=null,fT='all',fS='bad',fB='all';const TK={};
+function st(r){const blk=Math.floor(T/60),tb=Math.floor(T/20);
+ const sched=(T>=450&&T<=1020&&RN(r.id+'s'+blk)<(r.f===1?.66:.5))?r.cs[Math.floor(RN(r.id+'c'+blk)*r.cs.length)]:null;
+ let p=0;if(sched)p=Math.round(r.cap*(.45+.5*RN(r.id+'p'+tb+tick)));else if(RN(r.id+'g'+tb)<.06)p=1+Math.floor(RN(r.id+'n'+tb)*4);
+ if(sched&&RN(r.id+'o'+tb)<.04)p=Math.round(r.cap*1.18);
+ const ac=r.acBad?'RUSAK':(sched||RN(r.id+'a'+tb)<.12)?'ON':'OFF',tv=r.tvBad?'RUSAK':((sched&&RN(r.id+'t'+blk)<.7)||RN(r.id+'x'+tb)<.04)?'ON':'OFF',cc=r.ccOff?'OFFLINE':'ONLINE';
+ let an=null;if(cc==='ONLINE'){if(p>r.cap)an='Kerumunan melebihi kapasitas';else if(!sched&&p>=3)an='Aktivitas di luar jadwal';else if(RN(r.id+'m'+tb)<.012)an='Gerakan tidak wajar'}
+ return{sched,p:cc==='OFFLINE'?null:p,ac,tv,cc,an,waste:ac==='ON'&&p===0,err:ac==='RUSAK'?ERR[Math.floor(RN(r.id+'e')*4)]:null,bad:(ac==='RUSAK')+(tv==='RUSAK')+(cc==='OFFLINE')}}
+function calc(){RS.forEach(r=>S[r.id]=st(r))}
+function agg(){const A={p:0,cap:0,used:0,bad:0,an:0,waste:0,b:{}};FAC.forEach(F=>A.b[F[0]]={p:0,cap:0,used:0,bad:0,an:0,waste:0});
+ RS.forEach(r=>{const s=S[r.id],x=A.b[r.fac];[A,x].forEach(o=>{o.p+=s.p||0;o.cap+=r.cap;o.used+=(s.p>0||s.sched)?1:0;o.bad+=s.bad;o.an+=s.an?1:0;o.waste+=s.waste?1:0})});return A}
+const mix=(a,b,q)=>{q=Math.max(0,Math.min(1,q));const c=i=>Math.round(parseInt(a.substr(i,2),16)*(1-q)+parseInt(b.substr(i,2),16)*q);return'rgb('+c(1)+','+c(3)+','+c(5)+')'};
+const occ=q=>mix('#EDF3F6','#1F8FB8',q),hm=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'),idr=n=>'Rp'+new Intl.NumberFormat('id-ID').format(Math.round(n));
+const pill=(t,c)=>'<span class="pill '+(c||t)+'">'+t+'</span>';
+/* ===== Tampilan ===== */
+const NAV=[['peta','Peta Kampus'],['denah','Denah Gedung'],['perangkat','Perangkat dan Kerusakan'],['anomali','Anomali CCTV'],['integrasi','Integrasi Sistem']];
+function go(v,b,f){V=v;if(b)B=b;if(f)FL=+f;SEL=null;try{location.hash=v+(v==='denah'?'/'+B+'/'+FL:'')}catch(e){}render()}
+function sel(id){SEL=id;render(true)}
+function head(t,l){return'<h1>'+t+'</h1><div class="lead">'+l+'</div>'}
+function kpi(a){const w=a.waste*KW;return'<div class="row k4"><div class="card kpi"><h3>Orang di kampus</h3><div class="v">'+a.p+'</div><div class="l">hasil hitung CCTV, kapasitas '+a.cap+'</div></div>'+
+ '<div class="card kpi"><h3>Ruang terpakai</h3><div class="v">'+a.used+' / '+RS.length+'</div><div class="l">terjadwal atau ada orang</div></div>'+
+ '<div class="card kpi warn"><h3>Perangkat bermasalah</h3><div class="v">'+a.bad+'</div><div class="l">AC rusak, TV rusak, CCTV offline</div></div>'+
+ '<div class="card kpi warn"><h3>Anomali aktif</h3><div class="v">'+a.an+'</div><div class="l">dari analitik CCTV</div></div>'+
+ '<div class="card kpi"><h3>AC boros</h3><div class="v">'+a.waste+'</div><div class="l">menyala di ruang kosong, '+w.toFixed(1)+' kW, '+idr(w*TARIF)+'/jam</div></div></div>'}
+function campus(a){let g='<rect width="1000" height="560" rx="14" fill="#EEF3EA"/><rect x="20" y="205" width="960" height="115" fill="#DDE3DC"/><rect x="20" y="215" width="960" height="95" fill="#EEF3EA"/>'+
+ '<rect x="440" y="225" width="120" height="70" rx="6" fill="#C9CEDA" stroke="#9AA3B6"/><text x="500" y="265" text-anchor="middle" font-size="12" fill="#4A5570">Rektorat</text>'+
+ '<rect x="150" y="235" width="110" height="50" rx="6" fill="#C9CEDA" stroke="#9AA3B6"/><text x="205" y="265" text-anchor="middle" font-size="12" fill="#4A5570">Masjid</text>'+
+ '<rect x="700" y="235" width="120" height="50" rx="6" fill="#C9CEDA" stroke="#9AA3B6"/><text x="760" y="265" text-anchor="middle" font-size="12" fill="#4A5570">Kantin</text>'+
+ '<rect x="20" y="470" width="960" height="75" rx="8" fill="#D6D9E0"/><text x="60" y="515" font-size="12" fill="#4A5570">Area parkir</text><rect x="400" y="440" width="200" height="30" fill="#0B1630"/><text x="500" y="460" text-anchor="middle" font-size="11" fill="#fff">Gerbang Jl. RS Fatmawati</text>';
+ FAC.forEach(F=>{const x=F[3],y=F[4],s=a.b[F[0]],q=s.p/s.cap,an=s.an>=2;
+  g+='<g class="bld" onclick="go(\'denah\',\''+F[0]+'\',3)"><rect x="'+(x+5)+'" y="'+(y+6)+'" width="250" height="118" rx="8" fill="#0B1630" opacity=".13"/><rect x="'+x+'" y="'+y+'" width="250" height="118" rx="8" fill="'+occ(q*1.5)+'" stroke="'+(an?'#C8485E':'#0B1630')+'" stroke-width="'+(an?4:2)+'"/><rect x="'+(x+14)+'" y="'+(y+14)+'" width="222" height="90" rx="4" fill="none" stroke="#0B1630" stroke-opacity=".25" stroke-dasharray="5 4"/>'+
+  '<text x="'+(x+125)+'" y="'+(y+42)+'" text-anchor="middle" font-size="19" font-weight="700" fill="#0B1630">Gedung '+F[0]+'</text><text x="'+(x+125)+'" y="'+(y+60)+'" text-anchor="middle" font-size="10" fill="#0B1630">'+F[1]+' | 4 lantai</text>'+
+  '<text x="'+(x+125)+'" y="'+(y+88)+'" text-anchor="middle" font-size="13" font-weight="600" fill="#0B1630">'+s.p+' / '+s.cap+' orang</text>'+
+  (s.bad?'<rect x="'+(x+8)+'" y="'+(y+98)+'" width="58" height="17" rx="8" fill="#C8485E"/><text x="'+(x+37)+'" y="'+(y+110)+'" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">'+s.bad+' rusak</text>':'')+
+  (an?'<rect x="'+(x+184)+'" y="'+(y+98)+'" width="58" height="17" rx="8" fill="#D9A441"/><text x="'+(x+213)+'" y="'+(y+110)+'" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">'+s.an+' anomali</text>':'')+'</g>'});
+ return'<svg viewBox="0 0 1000 560" font-family="Poppins,system-ui">'+g+'</svg><div class="leg"><span>Warna gedung = tingkat keterisian</span><span><i style="background:'+occ(0)+'"></i>sepi</span><span><i style="background:'+occ(1)+'"></i>padat</span><span>Denah ilustratif, bukan denah resmi UPNVJ</span></div>'}
+function alerts(){const L=[],L2=(r)=>'<a class="lnk" onclick="go(\'denah\',\''+r.fac+'\','+r.f+');sel(\''+r.id+'\')">denah</a>';RS.forEach(r=>{const s=S[r.id];if(s.an)L.push([0,'<div class="al"><b>'+r.id+'</b> '+s.an+(s.p!=null?' ('+s.p+' orang)':'')+' '+L2(r)+'</div>']);
+ if(s.ac==='RUSAK'&&s.sched)L.push([1,'<div class="al w"><b>'+r.id+'</b> kelas aktif, AC rusak ('+s.err+') '+L2(r)+'</div>']);
+ if(s.waste)L.push([2,'<div class="al g"><b>'+r.id+'</b> AC menyala, ruang kosong '+L2(r)+'</div>'])});
+ L.sort((a,b)=>a[0]-b[0]);return L.slice(0,7).map(x=>x[1]).join('')||'<div class="lead">Tidak ada peringatan.</div>'}
+function vPeta(){const a=agg();return head('Peta Kampus','Gambaran 2D kampus UPNVJ dengan status tiap fakultas. Klik gedung untuk membuka denah per lantai.')+kpi(a)+'<div class="two"><div class="card"><h3>Denah kampus</h3>'+campus(a)+'</div><div class="card"><h3>Perlu perhatian</h3>'+alerts()+'</div></div>'}
+function facade(b){const F=FAC.find(x=>x[0]===b);let g='<rect width="440" height="350" rx="10" fill="#EAF1F6"/><rect y="318" width="440" height="32" fill="#C9D3C2"/><rect x="40" y="46" width="360" height="272" fill="#F3EFE4" stroke="#0B1630" stroke-width="2.5"/><rect x="30" y="34" width="380" height="14" fill="#0B1630"/><text x="220" y="26" text-anchor="middle" font-size="13" font-weight="700" fill="#0B1630">'+F[1]+'</text>';
+ for(let f=4;f>=1;f--){const y=56+(4-f)*65,on=f===FL;g+='<g class="bld" onclick="go(\'denah\',\''+b+'\','+f+')">'+(on?'<rect x="40" y="'+(y-3)+'" width="360" height="65" fill="#B8902F" fill-opacity=".14" stroke="#B8902F" stroke-width="2"/>':'')+'<text x="14" y="'+(y+38)+'" font-size="12" font-weight="700" fill="#0B1630">L'+f+'</text>';
+  for(let k=1;k<=8;k++){const r=RS.find(z=>z.id===b+'-'+f+'0'+k),s=S[r.id],x=50+(k-1)*43;g+='<rect x="'+x+'" y="'+(y+8)+'" width="34" height="42" rx="2" fill="'+(s.p==null?'#C9CEDA':occ(s.p/r.cap))+'" stroke="'+(s.an?'#C8485E':'#0B1630')+'" stroke-width="'+(s.an?2.5:1)+'"/>'+(s.bad?'<circle cx="'+(x+28)+'" cy="'+(y+14)+'" r="5" fill="#C8485E"/>':'')}
+  g+='</g>'}
+ g+='<rect x="195" y="286" width="50" height="32" fill="#0B1630"/><text x="220" y="340" text-anchor="middle" font-size="10" fill="#4A5570">Pintu masuk</text>';return'<svg viewBox="0 0 440 350" font-family="Poppins,system-ui">'+g+'</svg>'}
+function chip(x,y,l,s){const c=(s==='ON'||s==='ONLINE')?'#2E8B6E':(s==='OFF'?'#9AA3B6':'#C8485E');return'<rect x="'+x+'" y="'+y+'" width="40" height="19" rx="9" fill="'+c+'"/><text x="'+(x+20)+'" y="'+(y+13)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">'+l+((s==='RUSAK'||s==='OFFLINE')?' !':'')+'</text>'}
+function plan(b,f){const rs=RS.filter(r=>r.fac===b&&r.f===f);let g='<rect x="14" y="14" width="932" height="412" rx="8" fill="#fff" stroke="#0B1630" stroke-width="3"/><rect x="20" y="20" width="76" height="400" fill="#EFE9D8"/><text x="58" y="224" text-anchor="middle" font-size="12" fill="#6B7385" transform="rotate(-90 58 224)">Tangga dan lift</text><rect x="196" y="190" width="660" height="62" fill="#F6F2E6"/><text x="526" y="226" text-anchor="middle" font-size="12" fill="#8A93A6">Koridor</text><rect x="864" y="20" width="76" height="190" fill="#EFE9D8"/><text x="902" y="120" text-anchor="middle" font-size="12" fill="#6B7385">Toilet</text><rect x="864" y="230" width="76" height="190" fill="#EFE9D8"/><text x="902" y="330" text-anchor="middle" font-size="12" fill="#6B7385">Pantry</text>';
+ rs.forEach((r,i)=>{const s=S[r.id],c=i%4,w=186,h=150,x=104+c*190,y=i<4?30:266,fill=s.p==null?'#E6E8EE':(s.waste?'#FBE6EA':occ((s.p/r.cap)*.8)),on=SEL===r.id;
+  g+='<g class="rm" onclick="sel(\''+r.id+'\')"><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="4" fill="'+fill+'" stroke="'+(s.an?'#C8485E':on?'#B8902F':'#0B1630')+'" stroke-width="'+(s.an||on?4:1.5)+'"/>'+
+  '<text x="'+(x+10)+'" y="'+(y+22)+'" font-size="14" font-weight="700" fill="#0B1630">'+r.id+'</text><text x="'+(x+w-10)+'" y="'+(y+22)+'" text-anchor="end" font-size="10" fill="#6B7385">'+r.type+'</text>'+
+  '<text x="'+(x+10)+'" y="'+(y+42)+'" font-size="10.5" fill="#4A5570">'+(s.sched?s.sched.slice(0,24):'Tidak ada kelas')+'</text>'+
+  '<text x="'+(x+10)+'" y="'+(y+74)+'" font-size="22" font-weight="700" fill="#0B1630">'+(s.p==null?'-':s.p)+'<tspan font-size="11" font-weight="400" fill="#6B7385"> / '+r.cap+' orang</tspan></text>'+
+  '<rect x="'+(x+10)+'" y="'+(y+84)+'" width="'+(w-20)+'" height="7" rx="3" fill="#E4DCC8"/><rect x="'+(x+10)+'" y="'+(y+84)+'" width="'+(s.p==null?0:Math.min(1,s.p/r.cap)*(w-20))+'" height="7" rx="3" fill="'+(s.p>r.cap?'#C8485E':'#1F8FB8')+'"/>'+
+  chip(x+10,y+h-30,'AC',s.ac)+chip(x+56,y+h-30,'TV',s.tv)+chip(x+102,y+h-30,'CCTV',s.cc)+(s.an?'<polygon points="'+(x+w-22)+','+(y+h-32)+' '+(x+w-8)+','+(y+h-32)+' '+(x+w-15)+','+(y+h-46)+'" fill="#D9A441"/><text x="'+(x+w-15)+'" y="'+(y+h-34)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">!</text>':'')+'</g>'});
+ return'<svg viewBox="0 0 960 440" font-family="Poppins,system-ui">'+g+'</svg>'}
+function detail(){if(!SEL)return'<div class="lead">Klik ruangan pada denah untuk melihat detail perangkat dan jumlah orang.</div>';const r=RS.find(x=>x.id===SEL),s=S[r.id];const T1=(k,v)=>'<tr><td>'+k+'</td><td>'+v+'</td></tr>';
+ const tk=id=>TK[SEL+id]?pill(TK[SEL+id],'s-ok'):'<button class="btn" onclick="TK[SEL+\''+id+'\']=\'TK-\'+(1000+Math.floor(Math.random()*9000));render(true)">Buat tiket</button>';
+ return'<h3>'+r.id+' | '+r.fn+' | Lantai '+r.f+'</h3><table>'+T1('Jadwal',s.sched||'Tidak ada kelas')+T1('Jumlah orang (CCTV)',(s.p==null?'tidak diketahui (CCTV offline)':s.p+' dari kapasitas '+r.cap))+T1('AC',pill(s.ac)+(s.err?' '+s.err+' '+tk('ac'):'')+(s.waste?' <span class="lead">menyala di ruang kosong</span>':''))+T1('TV / proyektor',pill(s.tv)+(s.tv==='RUSAK'?' '+tk('tv'):''))+T1('CCTV',pill(s.cc)+(s.cc==='OFFLINE'?' '+tk('cc'):''))+T1('Anomali',s.an?pill('Peringatan','Sedang')+' '+s.an:'Tidak ada')+'</table>'}
+function vDenah(){return head('Denah Gedung','Tampak depan gedung dan denah lantai. Warna ruang menunjukkan keterisian, ikon AC/TV/CCTV menunjukkan status perangkat.')+'<div class="chips">'+FAC.map(F=>'<button class="'+(F[0]===B?'on':'')+'" onclick="go(\'denah\',\''+F[0]+'\','+FL+')">'+F[0]+'</button>').join('')+'</div><div class="two r"><div class="card"><h3>Tampak depan, '+B+'</h3>'+facade(B)+'<div class="leg"><span><i style="background:'+occ(0)+'"></i>kosong</span><span><i style="background:'+occ(1)+'"></i>penuh</span><span><i style="background:#C8485E"></i>perangkat bermasalah</span></div></div>'+
+ '<div class="card"><h3>Denah lantai '+FL+'</h3><div class="chips">'+[1,2,3,4].map(f=>'<button class="'+(f===FL?'on':'')+'" onclick="go(\'denah\',\''+B+'\','+f+')">Lantai '+f+'</button>').join('')+'</div>'+plan(B,FL)+'<div class="leg"><span>AC, TV, CCTV: hijau = menyala, abu = mati, merah = rusak atau offline</span><span>Segitiga kuning = anomali</span></div></div></div><div class="card" style="margin-top:14px">'+detail()+'</div>'}
+function devs(){const L=[];RS.forEach(r=>{const s=S[r.id];[['AC',s.ac,s.err||(s.ac==='ON'?KW+' kW':'')],['TV',s.tv,''],['CCTV',s.cc,s.p==null?'tidak ada data':s.p+' orang']].forEach(d=>L.push({r,t:d[0],s:d[1],n:d[2]}))});return L}
+function vPerangkat(){let L=devs();const sum=t=>{const x=L.filter(d=>d.t===t);return[x.length,x.filter(d=>d.s==='ON'||d.s==='ONLINE').length,x.filter(d=>d.s==='RUSAK'||d.s==='OFFLINE').length]};
+ const sm=['AC','TV','CCTV'].map(t=>{const z=sum(t);return'<div class="card kpi"><h3>'+t+'</h3><div class="v">'+z[0]+'</div><div class="l">'+z[1]+(t==='CCTV'?' online':' menyala')+' | <b style="color:var(--bad)">'+z[2]+(t==='CCTV'?' offline':' rusak')+'</b></div></div>'}).join('');
+ L=L.filter(d=>(fT==='all'||d.t===fT)&&(fB==='all'||d.r.fac===fB)&&(fS==='all'||(fS==='bad'?(d.s==='RUSAK'||d.s==='OFFLINE'):d.s===fS)));const n=L.length;
+ return head('Perangkat dan Kerusakan','AC, TV/proyektor, dan CCTV yang terintegrasi. Kerusakan terdeteksi dari kode error dan status koneksi perangkat.')+'<div class="row k4">'+sm+'</div><div class="card" style="margin-top:14px"><div class="chips"><select onchange="fT=this.value;render(true)">'+['all','AC','TV','CCTV'].map(x=>'<option value="'+x+'"'+(x===fT?' selected':'')+'>'+(x==='all'?'Semua jenis':x)+'</option>').join('')+'</select><select onchange="fS=this.value;render(true)"><option value="bad"'+(fS==='bad'?' selected':'')+'>Bermasalah</option><option value="all"'+(fS==='all'?' selected':'')+'>Semua status</option><option value="ON"'+(fS==='ON'?' selected':'')+'>Menyala</option></select><select onchange="fB=this.value;render(true)"><option value="all">Semua gedung</option>'+FAC.map(F=>'<option'+(F[0]===fB?' selected':'')+'>'+F[0]+'</option>').join('')+'</select><span class="lead" style="margin:7px 0 0">'+n+' perangkat</span></div>'+
+ '<table><thead><tr><th>Lokasi</th><th>Jenis</th><th>Status</th><th>Keterangan</th><th></th></tr></thead><tbody>'+L.slice(0,40).map(d=>'<tr><td><b>'+d.r.id+'</b><br><span class="lead">'+d.r.fn+', lantai '+d.r.f+'</span></td><td>'+d.t+'</td><td>'+pill(d.s)+'</td><td>'+d.n+'</td><td><a class="lnk" onclick="go(\'denah\',\''+d.r.fac+'\','+d.r.f+');sel(\''+d.r.id+'\')">Lihat denah</a></td></tr>').join('')+'</tbody></table></div>'}
+function vAnomali(){const a=agg(),L=RS.filter(r=>S[r.id].an);
+ const bars=FAC.map((F,i)=>{const s=a.b[F[0]],y=14+i*40;return'<text x="0" y="'+(y+16)+'" font-size="12" font-weight="600">'+F[0]+'</text><rect x="52" y="'+y+'" width="320" height="20" rx="4" fill="#EFEAD9"/><rect x="52" y="'+y+'" width="'+(s.p/s.cap*320)+'" height="20" rx="4" fill="#1F8FB8"/><text x="380" y="'+(y+15)+'" font-size="11" fill="#4A5570">'+s.p+' / '+s.cap+'</text>'}).join('');
+ return head('Anomali CCTV','Analitik CCTV di tepi (edge) hanya mengirim jumlah orang dan kejadian. Video tidak disimpan di UniTwin.')+'<div class="two"><div class="card"><h3>Kejadian aktif ('+L.length+')</h3><table><thead><tr><th>Waktu</th><th>Lokasi</th><th>Jenis</th><th>Tingkat</th><th>Orang</th><th></th></tr></thead><tbody>'+L.map(r=>{const s=S[r.id];return'<tr><td>'+hm(T)+'</td><td><b>'+r.id+'</b></td><td>'+s.an+'</td><td>'+pill(s.an==='Aktivitas di luar jadwal'?'Sedang':'Tinggi')+'</td><td>'+s.p+'</td><td><a class="lnk" onclick="go(\'denah\',\''+r.fac+'\','+r.f+');sel(\''+r.id+'\')">Denah</a></td></tr>'}).join('')+'</tbody></table></div><div class="card"><h3>Orang per gedung</h3><svg viewBox="0 0 440 260" font-family="Poppins,system-ui">'+bars+'</svg></div></div>'}
+function vIntegrasi(){const C=[['CCTV + analitik','Hitung orang dan deteksi anomali (kerumunan, gerakan tidak wajar)','RTSP ke edge, event via MQTT/HTTP',RS.length],['Kontroler AC','Status menyala/mati, kode error, daya','Modbus / BACnet',RS.length],['TV dan proyektor','Status daya dan kerusakan','PJLink / HDMI-CEC',RS.length],['Meter listrik','Konsumsi kWh per lantai','MQTT',FAC.length*4],['Jadwal akademik (SIAKAD)','Jadwal kuliah per ruang','REST API',RS.length]];
+ return head('Integrasi Sistem','UniTwin tidak menggantikan sistem yang ada. Ia menyatukan data dari sistem IoT kampus dalam satu aplikasi.')+'<div class="flow"><div><b>1. Sistem kampus</b>CCTV, AC, TV, meter, SIAKAD</div><div><b>2. Edge dan gateway</b>Analitik di tepi, konversi protokol</div><div><b>3. Platform UniTwin</b>Basis data, model digital twin, aturan dan prediksi</div><div><b>4. Aplikasi</b>Peta, denah, perangkat, anomali</div></div><div class="card" style="margin-top:14px"><table><thead><tr><th>Sistem</th><th>Data yang diambil</th><th>Protokol</th><th>Titik data</th><th>Status</th></tr></thead><tbody>'+C.map(c=>'<tr><td><b>'+c[0]+'</b></td><td>'+c[1]+'</td><td>'+c[2]+'</td><td>'+c[3]+'</td><td>'+pill('Terhubung (simulasi)','s-ok')+'</td></tr>').join('')+'</tbody></table></div><div class="card" style="margin-top:14px"><h3>Privasi</h3>Video dan wajah tidak masuk UniTwin. Yang dikirim hanya jumlah orang dan jenis kejadian, dengan akses dibatasi dan retensi terbatas sesuai UU No. 27 Tahun 2022.</div>'}
+function render(keep){calc();document.getElementById('nav').innerHTML=NAV.map(n=>'<button class="'+(n[0]===V?'on':'')+'" onclick="go(\''+n[0]+'\')">'+n[1]+'</button>').join('');document.getElementById('clk').textContent=hm(T);
+ const sy=window.scrollY;document.getElementById('m').innerHTML=({peta:vPeta,denah:vDenah,perangkat:vPerangkat,anomali:vAnomali,integrasi:vIntegrasi})[V]();if(keep)window.scrollTo(0,sy)}
+document.getElementById('sl').oninput=e=>{T=+e.target.value;render(true)};
+document.getElementById('pl').onclick=e=>{if(play){clearInterval(play);play=null;e.target.textContent='Putar'}else{e.target.textContent='Jeda';play=setInterval(()=>{T=T>=1200?360:T+10;document.getElementById('sl').value=T;render(true)},1200)}};
+setInterval(()=>{if(!play){tick++;render(true)}},8000);
+function fromHash(){const h=(location.hash||'').slice(1).split('/');if(NAV.some(n=>n[0]===h[0])&&(h[0]!==V||(h[1]&&h[1]!==B)||(h[2]&&+h[2]!==FL))){V=h[0];if(h[1])B=h[1];if(h[2])FL=+h[2];SEL=null;render()}}
+window.addEventListener('hashchange',fromHash);fromHash();render();
+</script>
+</body>
+</html>
