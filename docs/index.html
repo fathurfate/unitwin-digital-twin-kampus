@@ -3,9 +3,15 @@
 <head>
 <base target="_top">
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B1630">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>UniTwin - Kampus UPNVJ</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <style>
 :root{--navy:#0B1630;--navy2:#16254A;--gold:#B8902F;--gl:#E8D9AE;--ivory:#FAF7F0;--line:#E4DCC8;--tx:#1F2A44;--mu:#6B7385;--ok:#2E8B6E;--off:#9AA3B6;--bad:#C8485E;--am:#D9A441;--use:#1F8FB8}
 *{box-sizing:border-box}
@@ -42,6 +48,41 @@ a.lnk{color:var(--gold);font-weight:600;cursor:pointer;text-decoration:none}
 .bld{cursor:pointer}.rm{cursor:pointer}
 .flow{display:flex;gap:8px;align-items:stretch;flex-wrap:wrap}.flow div{flex:1;min-width:130px;background:#fff;border:1px solid var(--line);border-top:3px solid var(--gold);border-radius:10px;padding:10px;font-size:11.5px}
 .flow b{display:block;margin-bottom:3px;color:var(--navy)}
+.new{display:inline-block;background:var(--gl);color:var(--navy);font-size:9px;font-weight:700;border-radius:8px;padding:1px 7px;margin-left:6px;vertical-align:1px}nav button.on .new{background:#fff}
+#w3slot{position:relative;height:clamp(460px,72vh,700px);border-radius:10px;overflow:hidden;background:#CFE6F5}
+#w3{position:absolute;inset:0}#w3 canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.w3o{position:absolute;left:10px;top:10px;background:rgba(11,22,48,.8);color:#fff;border-radius:8px;padding:5px 11px;font-size:11px;font-weight:500;pointer-events:none}.w3o.r{left:auto;right:10px}
+.w3o.hint{top:auto;bottom:10px;background:rgba(255,255,255,.82);color:var(--mu);font-size:10.5px}
+#w3tip{position:absolute;display:none;pointer-events:none;background:rgba(11,22,48,.93);color:#fff;padding:8px 11px;border-radius:8px;font-size:11px;line-height:1.55;max-width:240px}
+.side{display:flex;flex-direction:column;gap:14px;min-width:0}.side .card h3{margin-bottom:6px}
+.scx{overflow-x:auto;-webkit-overflow-scrolling:touch}.swipe{display:none;font-size:10.5px;color:var(--mu);margin-top:4px}.w3o.hint .m{display:none}
+@media(max-width:768px){
+body{flex-direction:column}
+aside{display:contents}
+.logo{background:var(--navy);padding:calc(12px + env(safe-area-inset-top)) 16px 2px;font-size:20px}
+.sub{display:none}
+nav{position:sticky;top:0;z-index:30;display:flex;gap:6px;overflow-x:auto;background:var(--navy);padding:8px 12px 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+nav::-webkit-scrollbar{display:none}
+nav button{width:auto;flex:none;white-space:nowrap;margin:0;padding:9px 14px;border-radius:18px;font-size:12.5px;background:var(--navy2)}
+nav button.on{background:var(--gold)}
+.ctl{margin:0;border-radius:0;display:flex;align-items:center;gap:10px;padding:8px 16px}
+.ctl>div:first-child,.demo{display:none}
+.ctl .t{font-size:17px;min-width:52px}.ctl input{flex:1;margin:0}
+main{padding:14px 12px calc(32px + env(safe-area-inset-bottom))}
+h1{font-size:18px}.lead{font-size:12px}
+.k4{grid-template-columns:repeat(2,1fr);gap:10px}.k4>:last-child:nth-child(odd){grid-column:span 2}
+.kpi .v{font-size:22px}
+.card{padding:12px;overflow-x:auto}
+.two,.two.r{gap:12px}
+svg.w1{min-width:860px}svg.w2{min-width:760px}.swipe{display:block}
+.wt{min-width:600px}
+.chips button,select{padding:8px 14px;font-size:12.5px}select{font-size:16px}
+#w3slot{height:62vh;min-height:380px;max-height:560px}
+.w3o{font-size:10px;padding:4px 9px;max-width:80%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.w3o.r{display:none}
+.w3o.hint .d{display:none}.w3o.hint .m{display:inline}.w3o.hint{white-space:normal}
+.side .dt.has{order:-1}
+.leg{gap:6px 12px}
+}
 </style>
 </head>
 <body>
@@ -55,17 +96,22 @@ a.lnk{color:var(--gold);font-weight:600;cursor:pointer;text-decoration:none}
 <main id="m"></main>
 <script>
 /* ===== Model kampus (ilustratif, bukan denah resmi) ===== */
-const FAC=[['FIK','Fakultas Ilmu Komputer',['Basis Data','Sistem Operasi','Jaringan Komputer','Transformasi Digital','Pemrograman Web','Kecerdasan Buatan'],60,70],
-['FEB','Fakultas Ekonomi dan Bisnis',['Akuntansi Biaya','Manajemen Keuangan','Ekonomi Makro','Pemasaran','Perpajakan'],330,70],
-['FISIP','Fakultas Ilmu Sosial dan Ilmu Politik',['Teori Politik','Komunikasi Massa','Sosiologi','Hubungan Internasional'],600,70],
-['FH','Fakultas Hukum',['Hukum Pidana','Hukum Perdata','Hukum Tata Negara','Hukum Bisnis'],60,330],
-['FT','Fakultas Teknik',['Mekanika Teknik','Termodinamika','Elektronika','Teknik Industri'],330,330],
-['FK','Fakultas Kedokteran',['Anatomi','Fisiologi','Biokimia','Histologi'],600,330]];
+/* Nama gedung = sumber resmi UPNVJ (pengumuman UTBK 2026, laman FH dan FK). Pembagian fakultas (kecuali FH), posisi peta, dan ruang per lantai = ASUMSI, ubah di sini.
+   Kolom: kode, nama gedung, mata kuliah, x peta, y peta, ruang kelas per lantai, fakultas, fakultas terverifikasi?, lebar di peta, singkatan */
+const MKU=['Pendidikan Pancasila','Bahasa Indonesia','Bela Negara','Kewarganegaraan','Bahasa Inggris'];
+const FAC=[['KHD','Gedung Ki Hajar Dewantara',MKU,30,70,[3,3,3,3],'Kuliah bersama (mata kuliah umum)',false,230,'MKU'],
+['SOE','Gedung Dr. Soetomo',['Basis Data','Sistem Operasi','Jaringan Komputer','Transformasi Digital','Pemrograman Web','Kecerdasan Buatan'],280,70,[3,3,3,3],'Fakultas Ilmu Komputer',false,230,'FIK'],
+['CMK','Gedung Dr. Cipto Mangunkusumo',['Anatomi','Fisiologi','Biokimia','Histologi'],530,70,[3,3,3,3],'Fakultas Kedokteran',false,230,'FK'],
+['RAK','Gedung RA Kartini',['Metodologi Penelitian Hukum','Seminar Hukum','Hukum Kesehatan'],780,70,[2,1],'Hukum Pascasarjana (S2 dan S3)',true,190,'FH S2/S3'],
+['MHT','Gedung Moh. Husni Thamrin',['Akuntansi Biaya','Manajemen Keuangan','Ekonomi Makro','Pemasaran','Perpajakan'],30,330,[3,3,3,3],'Fakultas Ekonomi dan Bisnis',false,230,'FEB'],
+['MYM','Gedung Mr. Moh. Yamin',['Teori Politik','Komunikasi Massa','Sosiologi','Hubungan Internasional'],280,330,[2,2,2,2],'Fakultas Ilmu Sosial dan Ilmu Politik',false,230,'FISIP'],
+['YOS','Gedung Yos Sudarso',['Hukum Pidana','Hukum Perdata','Hukum Tata Negara','Hukum Bisnis'],530,330,[3,3,3,3],'Fakultas Hukum',true,230,'FH']];
+const BM={};FAC.forEach(F=>BM[F[0]]=F);const NF=c=>BM[c][5].length;
 const ERR=['E4 sensor suhu','E1 kompresor','F3 tekanan refrigeran','E7 komunikasi unit'],TARIF=1444.7,KW=1.8;
 const h32=s=>{let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0};
 const RN=s=>{let t=(h32(String(s))+0x6D2B79F5)>>>0;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296};
-const RS=[];FAC.forEach(F=>{for(let f=1;f<=4;f++)for(let k=1;k<=8;k++){const id=F[0]+'-'+f+'0'+k,lab=(f===2||f===3)&&k>=7;RS.push({id,fac:F[0],fn:F[1],f,k,type:lab?'Lab':'Kelas',cap:lab?30:40,cs:F[2],acBad:RN(id+'ac')<.06,tvBad:RN(id+'tv')<.05,ccOff:RN(id+'cc')<.02})}});
-let T=620,tick=0,S={},V='peta',B='FIK',FL=3,SEL=null,play=null,fT='all',fS='bad',fB='all';const TK={};
+const RS=[];FAC.forEach(F=>F[5].forEach((n,fi)=>{const f=fi+1;for(let k=1;k<=n;k++){const id=F[0]+'-'+f+'0'+k;RS.push({id,fac:F[0],fn:F[1]+' ('+F[9]+')',f,k,type:'Kelas',cap:40,cs:F[2],acBad:RN(id+'ac')<.06,tvBad:RN(id+'tv')<.05,ccOff:RN(id+'cc')<.02})}}));
+let T=620,tick=0,S={},V='peta',B='SOE',FL=3,SEL=null,play=null,fT='all',fS='bad',fB='all';const TK={};
 function st(r){const blk=Math.floor(T/60),tb=Math.floor(T/20);
  const sched=(T>=450&&T<=1020&&RN(r.id+'s'+blk)<(r.f===1?.66:.5))?r.cs[Math.floor(RN(r.id+'c'+blk)*r.cs.length)]:null;
  let p=0;if(sched)p=Math.round(r.cap*(.45+.5*RN(r.id+'p'+tb+tick)));else if(RN(r.id+'g'+tb)<.06)p=1+Math.floor(RN(r.id+'n'+tb)*4);
@@ -80,7 +126,7 @@ const mix=(a,b,q)=>{q=Math.max(0,Math.min(1,q));const c=i=>Math.round(parseInt(a
 const occ=q=>mix('#EDF3F6','#1F8FB8',q),hm=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0'),idr=n=>'Rp'+new Intl.NumberFormat('id-ID').format(Math.round(n));
 const pill=(t,c)=>'<span class="pill '+(c||t)+'">'+t+'</span>';
 /* ===== Tampilan ===== */
-const NAV=[['peta','Peta Kampus'],['denah','Denah Gedung'],['perangkat','Perangkat dan Kerusakan'],['anomali','Anomali CCTV'],['integrasi','Integrasi Sistem']];
+const NAV=[['peta','Peta Kampus'],['3d','Tampilan 3D <span class="new">Baru</span>'],['denah','Denah Gedung'],['perangkat','Perangkat dan Kerusakan'],['anomali','Anomali CCTV'],['integrasi','Integrasi Sistem']];
 function go(v,b,f){V=v;if(b)B=b;if(f)FL=+f;SEL=null;try{location.hash=v+(v==='denah'?'/'+B+'/'+FL:'')}catch(e){}render()}
 function sel(id){SEL=id;render(true)}
 function head(t,l){return'<h1>'+t+'</h1><div class="lead">'+l+'</div>'}
@@ -89,43 +135,47 @@ function kpi(a){const w=a.waste*KW;return'<div class="row k4"><div class="card k
  '<div class="card kpi warn"><h3>Perangkat bermasalah</h3><div class="v">'+a.bad+'</div><div class="l">AC rusak, TV rusak, CCTV offline</div></div>'+
  '<div class="card kpi warn"><h3>Anomali aktif</h3><div class="v">'+a.an+'</div><div class="l">dari analitik CCTV</div></div>'+
  '<div class="card kpi"><h3>AC boros</h3><div class="v">'+a.waste+'</div><div class="l">menyala di ruang kosong, '+w.toFixed(1)+' kW, '+idr(w*TARIF)+'/jam</div></div></div>'}
-function campus(a){let g='<rect width="1000" height="560" rx="14" fill="#EEF3EA"/><rect x="20" y="205" width="960" height="115" fill="#DDE3DC"/><rect x="20" y="215" width="960" height="95" fill="#EEF3EA"/>'+
- '<rect x="440" y="225" width="120" height="70" rx="6" fill="#C9CEDA" stroke="#9AA3B6"/><text x="500" y="265" text-anchor="middle" font-size="12" fill="#4A5570">Rektorat</text>'+
- '<rect x="150" y="235" width="110" height="50" rx="6" fill="#C9CEDA" stroke="#9AA3B6"/><text x="205" y="265" text-anchor="middle" font-size="12" fill="#4A5570">Masjid</text>'+
- '<rect x="700" y="235" width="120" height="50" rx="6" fill="#C9CEDA" stroke="#9AA3B6"/><text x="760" y="265" text-anchor="middle" font-size="12" fill="#4A5570">Kantin</text>'+
- '<rect x="20" y="470" width="960" height="75" rx="8" fill="#D6D9E0"/><text x="60" y="515" font-size="12" fill="#4A5570">Area parkir</text><rect x="400" y="440" width="200" height="30" fill="#0B1630"/><text x="500" y="460" text-anchor="middle" font-size="11" fill="#fff">Gerbang Jl. RS Fatmawati</text>';
- FAC.forEach(F=>{const x=F[3],y=F[4],s=a.b[F[0]],q=s.p/s.cap,an=s.an>=2;
-  g+='<g class="bld" onclick="go(\'denah\',\''+F[0]+'\',3)"><rect x="'+(x+5)+'" y="'+(y+6)+'" width="250" height="118" rx="8" fill="#0B1630" opacity=".13"/><rect x="'+x+'" y="'+y+'" width="250" height="118" rx="8" fill="'+occ(q*1.5)+'" stroke="'+(an?'#C8485E':'#0B1630')+'" stroke-width="'+(an?4:2)+'"/><rect x="'+(x+14)+'" y="'+(y+14)+'" width="222" height="90" rx="4" fill="none" stroke="#0B1630" stroke-opacity=".25" stroke-dasharray="5 4"/>'+
-  '<text x="'+(x+125)+'" y="'+(y+42)+'" text-anchor="middle" font-size="19" font-weight="700" fill="#0B1630">Gedung '+F[0]+'</text><text x="'+(x+125)+'" y="'+(y+60)+'" text-anchor="middle" font-size="10" fill="#0B1630">'+F[1]+' | 4 lantai</text>'+
-  '<text x="'+(x+125)+'" y="'+(y+88)+'" text-anchor="middle" font-size="13" font-weight="600" fill="#0B1630">'+s.p+' / '+s.cap+' orang</text>'+
+function campus(a){const pb=(x,y,w,h,L)=>'<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="6" fill="#C9CEDA" stroke="#9AA3B6"/>'+L.map((t,i)=>'<text x="'+(x+w/2)+'" y="'+(y+h/2+4+(i-(L.length-1)/2)*14)+'" text-anchor="middle" font-size="11.5" fill="#4A5570">'+t+'</text>').join('');
+ let g='<rect width="1000" height="560" rx="14" fill="#EEF3EA"/><rect x="20" y="205" width="960" height="115" fill="#DDE3DC"/><rect x="20" y="215" width="960" height="95" fill="#EEF3EA"/>'+
+ pb(60,225,140,70,['Perpustakaan Pusat','(3 lantai)'])+pb(300,235,100,50,['KanBers'])+pb(440,225,120,70,['Rektorat'])+pb(620,225,150,70,['Auditorium','Bhinneka Tunggal Ika'])+
+ '<rect x="800" y="335" width="170" height="105" rx="8" fill="#CFE0EC" stroke="#9AA3B6"/><text x="885" y="392" text-anchor="middle" font-size="12" fill="#4A5570">Lapangan olahraga</text>'+
+ '<rect x="20" y="470" width="960" height="75" rx="8" fill="#D6D9E0"/><text x="60" y="515" font-size="12" fill="#4A5570">Area parkir</text><rect x="400" y="451" width="200" height="22" fill="#0B1630"/><text x="500" y="466" text-anchor="middle" font-size="11" fill="#fff">Gerbang Jl. RS Fatmawati</text>';
+ FAC.forEach(F=>{const x=F[3],y=F[4],w=F[8],s=a.b[F[0]],q=s.p/s.cap,an=s.an>=2,cx=x+w/2,nf=F[5].length;
+  g+='<g class="bld" onclick="go(\'denah\',\''+F[0]+'\','+Math.min(3,nf)+')"><rect x="'+(x+5)+'" y="'+(y+6)+'" width="'+w+'" height="118" rx="8" fill="#0B1630" opacity=".13"/><rect x="'+x+'" y="'+y+'" width="'+w+'" height="118" rx="8" fill="'+occ(q*1.5)+'" stroke="'+(an?'#C8485E':'#0B1630')+'" stroke-width="'+(an?4:2)+'"/><rect x="'+(x+14)+'" y="'+(y+14)+'" width="'+(w-28)+'" height="90" rx="4" fill="none" stroke="#0B1630" stroke-opacity=".25" stroke-dasharray="5 4"/>'+
+  '<text x="'+cx+'" y="'+(y+40)+'" text-anchor="middle" font-size="'+(F[1].length>26?12.5:14)+'" font-weight="700" fill="#0B1630">'+F[1]+'</text><text x="'+cx+'" y="'+(y+57)+'" text-anchor="middle" font-size="10" fill="#0B1630">'+F[9]+(F[7]?'':' (asumsi)')+' | '+nf+' lantai</text>'+
+  '<text x="'+cx+'" y="'+(y+84)+'" text-anchor="middle" font-size="13" font-weight="600" fill="#0B1630">'+s.p+' / '+s.cap+' orang</text>'+
   (s.bad?'<rect x="'+(x+8)+'" y="'+(y+98)+'" width="58" height="17" rx="8" fill="#C8485E"/><text x="'+(x+37)+'" y="'+(y+110)+'" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">'+s.bad+' rusak</text>':'')+
-  (an?'<rect x="'+(x+184)+'" y="'+(y+98)+'" width="58" height="17" rx="8" fill="#D9A441"/><text x="'+(x+213)+'" y="'+(y+110)+'" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">'+s.an+' anomali</text>':'')+'</g>'});
- return'<svg viewBox="0 0 1000 560" font-family="Poppins,system-ui">'+g+'</svg><div class="leg"><span>Warna gedung = tingkat keterisian</span><span><i style="background:'+occ(0)+'"></i>sepi</span><span><i style="background:'+occ(1)+'"></i>padat</span><span>Denah ilustratif, bukan denah resmi UPNVJ</span></div>'}
+  (an?'<rect x="'+(x+w-66)+'" y="'+(y+98)+'" width="58" height="17" rx="8" fill="#D9A441"/><text x="'+(x+w-37)+'" y="'+(y+110)+'" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">'+s.an+' anomali</text>':'')+'</g>'});
+ return'<div class="scx"><svg class="w1" viewBox="0 0 1000 560" font-family="Poppins,system-ui">'+g+'</svg></div><div class="swipe">Geser ke samping untuk melihat seluruh peta</div><div class="leg"><span>Warna gedung = tingkat keterisian</span><span><i style="background:'+occ(0)+'"></i>sepi</span><span><i style="background:'+occ(1)+'"></i>padat</span><span>Nama gedung dari sumber resmi UPNVJ; posisi dan pembagian fakultas (asumsi) ilustratif</span></div>'}
 function alerts(){const L=[],L2=(r)=>'<a class="lnk" onclick="go(\'denah\',\''+r.fac+'\','+r.f+');sel(\''+r.id+'\')">denah</a>';RS.forEach(r=>{const s=S[r.id];if(s.an)L.push([0,'<div class="al"><b>'+r.id+'</b> '+s.an+(s.p!=null?' ('+s.p+' orang)':'')+' '+L2(r)+'</div>']);
  if(s.ac==='RUSAK'&&s.sched)L.push([1,'<div class="al w"><b>'+r.id+'</b> kelas aktif, AC rusak ('+s.err+') '+L2(r)+'</div>']);
  if(s.waste)L.push([2,'<div class="al g"><b>'+r.id+'</b> AC menyala, ruang kosong '+L2(r)+'</div>'])});
  L.sort((a,b)=>a[0]-b[0]);return L.slice(0,7).map(x=>x[1]).join('')||'<div class="lead">Tidak ada peringatan.</div>'}
-function vPeta(){const a=agg();return head('Peta Kampus','Gambaran 2D kampus UPNVJ dengan status tiap fakultas. Klik gedung untuk membuka denah per lantai.')+kpi(a)+'<div class="two"><div class="card"><h3>Denah kampus</h3>'+campus(a)+'</div><div class="card"><h3>Perlu perhatian</h3>'+alerts()+'</div></div>'}
-function facade(b){const F=FAC.find(x=>x[0]===b);let g='<rect width="440" height="350" rx="10" fill="#EAF1F6"/><rect y="318" width="440" height="32" fill="#C9D3C2"/><rect x="40" y="46" width="360" height="272" fill="#F3EFE4" stroke="#0B1630" stroke-width="2.5"/><rect x="30" y="34" width="380" height="14" fill="#0B1630"/><text x="220" y="26" text-anchor="middle" font-size="13" font-weight="700" fill="#0B1630">'+F[1]+'</text>';
- for(let f=4;f>=1;f--){const y=56+(4-f)*65,on=f===FL;g+='<g class="bld" onclick="go(\'denah\',\''+b+'\','+f+')">'+(on?'<rect x="40" y="'+(y-3)+'" width="360" height="65" fill="#B8902F" fill-opacity=".14" stroke="#B8902F" stroke-width="2"/>':'')+'<text x="14" y="'+(y+38)+'" font-size="12" font-weight="700" fill="#0B1630">L'+f+'</text>';
-  for(let k=1;k<=8;k++){const r=RS.find(z=>z.id===b+'-'+f+'0'+k),s=S[r.id],x=50+(k-1)*43;g+='<rect x="'+x+'" y="'+(y+8)+'" width="34" height="42" rx="2" fill="'+(s.p==null?'#C9CEDA':occ(s.p/r.cap))+'" stroke="'+(s.an?'#C8485E':'#0B1630')+'" stroke-width="'+(s.an?2.5:1)+'"/>'+(s.bad?'<circle cx="'+(x+28)+'" cy="'+(y+14)+'" r="5" fill="#C8485E"/>':'')}
+function vPeta(){const a=agg();return head('Peta Kampus','Gambaran 2D kampus UPNVJ dengan status tiap fakultas. Klik gedung untuk membuka denah per lantai.')+kpi(a)+'<div class="two"><div class="card"><h3>Denah kampus <a class="lnk" style="float:right;text-transform:none;letter-spacing:0" onclick="go(\'3d\')">Lihat versi 3D &rarr;</a></h3>'+campus(a)+'</div><div class="card"><h3>Perlu perhatian</h3>'+alerts()+'</div></div>'}
+function facade(b){const F=BM[b],nf=F[5].length,bt=318-nf*65-12;let g='<rect width="440" height="350" rx="10" fill="#EAF1F6"/><rect y="318" width="440" height="32" fill="#C9D3C2"/><rect x="40" y="'+bt+'" width="360" height="'+(318-bt)+'" fill="#F3EFE4" stroke="#0B1630" stroke-width="2.5"/><rect x="30" y="'+(bt-12)+'" width="380" height="14" fill="#0B1630"/><text x="220" y="'+(bt-20)+'" text-anchor="middle" font-size="13" font-weight="700" fill="#0B1630">'+F[1]+'</text>';
+ for(let f=nf;f>=1;f--){const y=bt+10+(nf-f)*65,on=f===FL;g+='<g class="bld" onclick="go(\'denah\',\''+b+'\','+f+')">'+(on?'<rect x="40" y="'+(y-3)+'" width="360" height="65" fill="#B8902F" fill-opacity=".14" stroke="#B8902F" stroke-width="2"/>':'')+'<text x="14" y="'+(y+38)+'" font-size="12" font-weight="700" fill="#0B1630">L'+f+'</text>';
+  for(let k=1;k<=3;k++){const x=50+(k-1)*115,r=RS.find(z=>z.id===b+'-'+f+'0'+k);
+   if(!r){g+='<rect x="'+x+'" y="'+(y+8)+'" width="105" height="42" rx="2" fill="#E9E4D4" stroke="#C9C2AC"/>';continue}
+   const s=S[r.id];g+='<rect x="'+x+'" y="'+(y+8)+'" width="105" height="42" rx="2" fill="'+(s.p==null?'#C9CEDA':occ(s.p/r.cap))+'" stroke="'+(s.an?'#C8485E':'#0B1630')+'" stroke-width="'+(s.an?2.5:1)+'"/><text x="'+(x+8)+'" y="'+(y+33)+'" font-size="11" font-weight="600" fill="#0B1630">'+r.id+'</text>'+(s.bad?'<circle cx="'+(x+93)+'" cy="'+(y+19)+'" r="5" fill="#C8485E"/>':'')}
   g+='</g>'}
  g+='<rect x="195" y="286" width="50" height="32" fill="#0B1630"/><text x="220" y="340" text-anchor="middle" font-size="10" fill="#4A5570">Pintu masuk</text>';return'<svg viewBox="0 0 440 350" font-family="Poppins,system-ui">'+g+'</svg>'}
 function chip(x,y,l,s){const c=(s==='ON'||s==='ONLINE')?'#2E8B6E':(s==='OFF'?'#9AA3B6':'#C8485E');return'<rect x="'+x+'" y="'+y+'" width="40" height="19" rx="9" fill="'+c+'"/><text x="'+(x+20)+'" y="'+(y+13)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">'+l+((s==='RUSAK'||s==='OFFLINE')?' !':'')+'</text>'}
-function plan(b,f){const rs=RS.filter(r=>r.fac===b&&r.f===f);let g='<rect x="14" y="14" width="932" height="412" rx="8" fill="#fff" stroke="#0B1630" stroke-width="3"/><rect x="20" y="20" width="76" height="400" fill="#EFE9D8"/><text x="58" y="224" text-anchor="middle" font-size="12" fill="#6B7385" transform="rotate(-90 58 224)">Tangga dan lift</text><rect x="196" y="190" width="660" height="62" fill="#F6F2E6"/><text x="526" y="226" text-anchor="middle" font-size="12" fill="#8A93A6">Koridor</text><rect x="864" y="20" width="76" height="190" fill="#EFE9D8"/><text x="902" y="120" text-anchor="middle" font-size="12" fill="#6B7385">Toilet</text><rect x="864" y="230" width="76" height="190" fill="#EFE9D8"/><text x="902" y="330" text-anchor="middle" font-size="12" fill="#6B7385">Pantry</text>';
- rs.forEach((r,i)=>{const s=S[r.id],c=i%4,w=186,h=150,x=104+c*190,y=i<4?30:266,fill=s.p==null?'#E6E8EE':(s.waste?'#FBE6EA':occ((s.p/r.cap)*.8)),on=SEL===r.id;
+function plan(b,f){const F=BM[b],n=F[5][f-1],sw=(752-16)/3;let g='<rect x="14" y="14" width="932" height="262" rx="8" fill="#fff" stroke="#0B1630" stroke-width="3"/><rect x="20" y="20" width="76" height="250" fill="#EFE9D8"/><text x="58" y="145" text-anchor="middle" font-size="12" fill="#6B7385" transform="rotate(-90 58 145)">Tangga dan lift</text><rect x="104" y="190" width="752" height="80" fill="#F6F2E6"/><text x="480" y="236" text-anchor="middle" font-size="12" fill="#8A93A6">Koridor</text><rect x="864" y="20" width="76" height="120" fill="#EFE9D8"/><text x="902" y="85" text-anchor="middle" font-size="12" fill="#6B7385">Toilet</text><rect x="864" y="150" width="76" height="120" fill="#EFE9D8"/><text x="902" y="215" text-anchor="middle" font-size="12" fill="#6B7385">Pantry</text>';
+ for(let i=0;i<3;i++){const x=104+i*(sw+8),y=30,h=150,w=sw,r=RS.find(z=>z.id===b+'-'+f+'0'+(i+1));
+  if(!r){g+='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="4" fill="#F2EFE4" stroke="#C9C2AC" stroke-dasharray="6 4"/><text x="'+(x+w/2)+'" y="'+(y+h/2+4)+'" text-anchor="middle" font-size="11" fill="#9A927C">Ruang non-kelas (tidak dipantau)</text>';continue}
+  const s=S[r.id],fill=s.p==null?'#E6E8EE':(s.waste?'#FBE6EA':occ((s.p/r.cap)*.8)),on=SEL===r.id;
   g+='<g class="rm" onclick="sel(\''+r.id+'\')"><rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="4" fill="'+fill+'" stroke="'+(s.an?'#C8485E':on?'#B8902F':'#0B1630')+'" stroke-width="'+(s.an||on?4:1.5)+'"/>'+
   '<text x="'+(x+10)+'" y="'+(y+22)+'" font-size="14" font-weight="700" fill="#0B1630">'+r.id+'</text><text x="'+(x+w-10)+'" y="'+(y+22)+'" text-anchor="end" font-size="10" fill="#6B7385">'+r.type+'</text>'+
-  '<text x="'+(x+10)+'" y="'+(y+42)+'" font-size="10.5" fill="#4A5570">'+(s.sched?s.sched.slice(0,24):'Tidak ada kelas')+'</text>'+
+  '<text x="'+(x+10)+'" y="'+(y+42)+'" font-size="10.5" fill="#4A5570">'+(s.sched?s.sched.slice(0,26):'Tidak ada kelas')+'</text>'+
   '<text x="'+(x+10)+'" y="'+(y+74)+'" font-size="22" font-weight="700" fill="#0B1630">'+(s.p==null?'-':s.p)+'<tspan font-size="11" font-weight="400" fill="#6B7385"> / '+r.cap+' orang</tspan></text>'+
   '<rect x="'+(x+10)+'" y="'+(y+84)+'" width="'+(w-20)+'" height="7" rx="3" fill="#E4DCC8"/><rect x="'+(x+10)+'" y="'+(y+84)+'" width="'+(s.p==null?0:Math.min(1,s.p/r.cap)*(w-20))+'" height="7" rx="3" fill="'+(s.p>r.cap?'#C8485E':'#1F8FB8')+'"/>'+
-  chip(x+10,y+h-30,'AC',s.ac)+chip(x+56,y+h-30,'TV',s.tv)+chip(x+102,y+h-30,'CCTV',s.cc)+(s.an?'<polygon points="'+(x+w-22)+','+(y+h-32)+' '+(x+w-8)+','+(y+h-32)+' '+(x+w-15)+','+(y+h-46)+'" fill="#D9A441"/><text x="'+(x+w-15)+'" y="'+(y+h-34)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">!</text>':'')+'</g>'});
- return'<svg viewBox="0 0 960 440" font-family="Poppins,system-ui">'+g+'</svg>'}
+  chip(x+10,y+h-30,'AC',s.ac)+chip(x+56,y+h-30,'TV',s.tv)+chip(x+102,y+h-30,'CCTV',s.cc)+(s.an?'<polygon points="'+(x+w-22)+','+(y+h-32)+' '+(x+w-8)+','+(y+h-32)+' '+(x+w-15)+','+(y+h-46)+'" fill="#D9A441"/><text x="'+(x+w-15)+'" y="'+(y+h-34)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">!</text>':'')+'</g>'}
+ return'<div class="scx"><svg class="w2" viewBox="0 0 960 290" font-family="Poppins,system-ui">'+g+'</svg></div><div class="swipe">Geser ke samping untuk melihat seluruh denah</div>'}
 function detail(){if(!SEL)return'<div class="lead">Klik ruangan pada denah untuk melihat detail perangkat dan jumlah orang.</div>';const r=RS.find(x=>x.id===SEL),s=S[r.id];const T1=(k,v)=>'<tr><td>'+k+'</td><td>'+v+'</td></tr>';
  const tk=id=>TK[SEL+id]?pill(TK[SEL+id],'s-ok'):'<button class="btn" onclick="TK[SEL+\''+id+'\']=\'TK-\'+(1000+Math.floor(Math.random()*9000));render(true)">Buat tiket</button>';
  return'<h3>'+r.id+' | '+r.fn+' | Lantai '+r.f+'</h3><table>'+T1('Jadwal',s.sched||'Tidak ada kelas')+T1('Jumlah orang (CCTV)',(s.p==null?'tidak diketahui (CCTV offline)':s.p+' dari kapasitas '+r.cap))+T1('AC',pill(s.ac)+(s.err?' '+s.err+' '+tk('ac'):'')+(s.waste?' <span class="lead">menyala di ruang kosong</span>':''))+T1('TV / proyektor',pill(s.tv)+(s.tv==='RUSAK'?' '+tk('tv'):''))+T1('CCTV',pill(s.cc)+(s.cc==='OFFLINE'?' '+tk('cc'):''))+T1('Anomali',s.an?pill('Peringatan','Sedang')+' '+s.an:'Tidak ada')+'</table>'}
-function vDenah(){return head('Denah Gedung','Tampak depan gedung dan denah lantai. Warna ruang menunjukkan keterisian, ikon AC/TV/CCTV menunjukkan status perangkat.')+'<div class="chips">'+FAC.map(F=>'<button class="'+(F[0]===B?'on':'')+'" onclick="go(\'denah\',\''+F[0]+'\','+FL+')">'+F[0]+'</button>').join('')+'</div><div class="two r"><div class="card"><h3>Tampak depan, '+B+'</h3>'+facade(B)+'<div class="leg"><span><i style="background:'+occ(0)+'"></i>kosong</span><span><i style="background:'+occ(1)+'"></i>penuh</span><span><i style="background:#C8485E"></i>perangkat bermasalah</span></div></div>'+
- '<div class="card"><h3>Denah lantai '+FL+'</h3><div class="chips">'+[1,2,3,4].map(f=>'<button class="'+(f===FL?'on':'')+'" onclick="go(\'denah\',\''+B+'\','+f+')">Lantai '+f+'</button>').join('')+'</div>'+plan(B,FL)+'<div class="leg"><span>AC, TV, CCTV: hijau = menyala, abu = mati, merah = rusak atau offline</span><span>Segitiga kuning = anomali</span></div></div></div><div class="card" style="margin-top:14px">'+detail()+'</div>'}
+function vDenah(){if(FL>NF(B))FL=NF(B);const F=BM[B],fls=Array.from({length:NF(B)},(_,i)=>i+1);return head('Denah Gedung','Tampak depan gedung dan denah lantai. Warna ruang menunjukkan keterisian, ikon AC/TV/CCTV menunjukkan status perangkat.')+'<div class="chips">'+FAC.map(X=>'<button class="'+(X[0]===B?'on':'')+'" onclick="go(\'denah\',\''+X[0]+'\','+FL+')">'+X[0]+'</button>').join('')+'<button onclick="view3d(\''+B+'\','+FL+')" style="background:var(--gold);color:#fff;border-color:var(--gold)">Lihat 3D</button></div><div class="lead" style="margin-top:-6px">'+F[1]+' | '+F[6]+(F[7]?' (sesuai laman resmi)':' (asumsi, belum diverifikasi)')+' | '+NF(B)+' lantai, '+RS.filter(r=>r.fac===B).length+' ruang kelas</div><div class="two r"><div class="card"><h3>Tampak depan, '+F[1]+'</h3>'+facade(B)+'<div class="leg"><span><i style="background:'+occ(0)+'"></i>kosong</span><span><i style="background:'+occ(1)+'"></i>penuh</span><span><i style="background:#C8485E"></i>perangkat bermasalah</span></div></div>'+
+ '<div class="card"><h3>Denah lantai '+FL+'</h3><div class="chips">'+fls.map(f=>'<button class="'+(f===FL?'on':'')+'" onclick="go(\'denah\',\''+B+'\','+f+')">Lantai '+f+'</button>').join('')+'</div>'+plan(B,FL)+'<div class="leg"><span>AC, TV, CCTV: hijau = menyala, abu = mati, merah = rusak atau offline</span><span>Segitiga kuning = anomali</span></div></div></div><div class="card" style="margin-top:14px">'+detail()+'</div>'}
 function devs(){const L=[];RS.forEach(r=>{const s=S[r.id];[['AC',s.ac,s.err||(s.ac==='ON'?KW+' kW':'')],['TV',s.tv,''],['CCTV',s.cc,s.p==null?'tidak ada data':s.p+' orang']].forEach(d=>L.push({r,t:d[0],s:d[1],n:d[2]}))});return L}
 function vPerangkat(){let L=devs();const sum=t=>{const x=L.filter(d=>d.t===t);return[x.length,x.filter(d=>d.s==='ON'||d.s==='ONLINE').length,x.filter(d=>d.s==='RUSAK'||d.s==='OFFLINE').length]};
  const sm=['AC','TV','CCTV'].map(t=>{const z=sum(t);return'<div class="card kpi"><h3>'+t+'</h3><div class="v">'+z[0]+'</div><div class="l">'+z[1]+(t==='CCTV'?' online':' menyala')+' | <b style="color:var(--bad)">'+z[2]+(t==='CCTV'?' offline':' rusak')+'</b></div></div>'}).join('');
@@ -134,15 +184,166 @@ function vPerangkat(){let L=devs();const sum=t=>{const x=L.filter(d=>d.t===t);re
  '<table><thead><tr><th>Lokasi</th><th>Jenis</th><th>Status</th><th>Keterangan</th><th></th></tr></thead><tbody>'+L.slice(0,40).map(d=>'<tr><td><b>'+d.r.id+'</b><br><span class="lead">'+d.r.fn+', lantai '+d.r.f+'</span></td><td>'+d.t+'</td><td>'+pill(d.s)+'</td><td>'+d.n+'</td><td><a class="lnk" onclick="go(\'denah\',\''+d.r.fac+'\','+d.r.f+');sel(\''+d.r.id+'\')">Lihat denah</a></td></tr>').join('')+'</tbody></table></div>'}
 function vAnomali(){const a=agg(),L=RS.filter(r=>S[r.id].an);
  const bars=FAC.map((F,i)=>{const s=a.b[F[0]],y=14+i*40;return'<text x="0" y="'+(y+16)+'" font-size="12" font-weight="600">'+F[0]+'</text><rect x="52" y="'+y+'" width="320" height="20" rx="4" fill="#EFEAD9"/><rect x="52" y="'+y+'" width="'+(s.p/s.cap*320)+'" height="20" rx="4" fill="#1F8FB8"/><text x="380" y="'+(y+15)+'" font-size="11" fill="#4A5570">'+s.p+' / '+s.cap+'</text>'}).join('');
- return head('Anomali CCTV','Analitik CCTV di tepi (edge) hanya mengirim jumlah orang dan kejadian. Video tidak disimpan di UniTwin.')+'<div class="two"><div class="card"><h3>Kejadian aktif ('+L.length+')</h3><table><thead><tr><th>Waktu</th><th>Lokasi</th><th>Jenis</th><th>Tingkat</th><th>Orang</th><th></th></tr></thead><tbody>'+L.map(r=>{const s=S[r.id];return'<tr><td>'+hm(T)+'</td><td><b>'+r.id+'</b></td><td>'+s.an+'</td><td>'+pill(s.an==='Aktivitas di luar jadwal'?'Sedang':'Tinggi')+'</td><td>'+s.p+'</td><td><a class="lnk" onclick="go(\'denah\',\''+r.fac+'\','+r.f+');sel(\''+r.id+'\')">Denah</a></td></tr>'}).join('')+'</tbody></table></div><div class="card"><h3>Orang per gedung</h3><svg viewBox="0 0 440 260" font-family="Poppins,system-ui">'+bars+'</svg></div></div>'}
-function vIntegrasi(){const C=[['CCTV + analitik','Hitung orang dan deteksi anomali (kerumunan, gerakan tidak wajar)','RTSP ke edge, event via MQTT/HTTP',RS.length],['Kontroler AC','Status menyala/mati, kode error, daya','Modbus / BACnet',RS.length],['TV dan proyektor','Status daya dan kerusakan','PJLink / HDMI-CEC',RS.length],['Meter listrik','Konsumsi kWh per lantai','MQTT',FAC.length*4],['Jadwal akademik (SIAKAD)','Jadwal kuliah per ruang','REST API',RS.length]];
- return head('Integrasi Sistem','UniTwin tidak menggantikan sistem yang ada. Ia menyatukan data dari sistem IoT kampus dalam satu aplikasi.')+'<div class="flow"><div><b>1. Sistem kampus</b>CCTV, AC, TV, meter, SIAKAD</div><div><b>2. Edge dan gateway</b>Analitik di tepi, konversi protokol</div><div><b>3. Platform UniTwin</b>Basis data, model digital twin, aturan dan prediksi</div><div><b>4. Aplikasi</b>Peta, denah, perangkat, anomali</div></div><div class="card" style="margin-top:14px"><table><thead><tr><th>Sistem</th><th>Data yang diambil</th><th>Protokol</th><th>Titik data</th><th>Status</th></tr></thead><tbody>'+C.map(c=>'<tr><td><b>'+c[0]+'</b></td><td>'+c[1]+'</td><td>'+c[2]+'</td><td>'+c[3]+'</td><td>'+pill('Terhubung (simulasi)','s-ok')+'</td></tr>').join('')+'</tbody></table></div><div class="card" style="margin-top:14px"><h3>Privasi</h3>Video dan wajah tidak masuk UniTwin. Yang dikirim hanya jumlah orang dan jenis kejadian, dengan akses dibatasi dan retensi terbatas sesuai UU No. 27 Tahun 2022.</div>'}
+ return head('Anomali CCTV','Analitik CCTV di tepi (edge) hanya mengirim jumlah orang dan kejadian. Video tidak disimpan di UniTwin.')+'<div class="two"><div class="card"><h3>Kejadian aktif ('+L.length+')</h3><table><thead><tr><th>Waktu</th><th>Lokasi</th><th>Jenis</th><th>Tingkat</th><th>Orang</th><th></th></tr></thead><tbody>'+L.map(r=>{const s=S[r.id];return'<tr><td>'+hm(T)+'</td><td><b>'+r.id+'</b></td><td>'+s.an+'</td><td>'+pill(s.an==='Aktivitas di luar jadwal'?'Sedang':'Tinggi')+'</td><td>'+s.p+'</td><td><a class="lnk" onclick="go(\'denah\',\''+r.fac+'\','+r.f+');sel(\''+r.id+'\')">Denah</a></td></tr>'}).join('')+'</tbody></table></div><div class="card"><h3>Orang per gedung</h3><svg viewBox="0 0 440 290" font-family="Poppins,system-ui">'+bars+'</svg></div></div>'}
+function vIntegrasi(){const C=[['CCTV + analitik','Hitung orang dan deteksi anomali (kerumunan, gerakan tidak wajar)','RTSP ke edge, event via MQTT/HTTP',RS.length],['Kontroler AC','Status menyala/mati, kode error, daya','Modbus / BACnet',RS.length],['TV dan proyektor','Status daya dan kerusakan','PJLink / HDMI-CEC',RS.length],['Meter listrik','Konsumsi kWh per lantai','MQTT',FAC.reduce((n,F)=>n+F[5].length,0)],['Jadwal akademik (SIAKAD)','Jadwal kuliah per ruang','REST API',RS.length]];
+ return head('Integrasi Sistem','UniTwin tidak menggantikan sistem yang ada. Ia menyatukan data dari sistem IoT kampus dalam satu aplikasi.')+'<div class="flow"><div><b>1. Sistem kampus</b>CCTV, AC, TV, meter, SIAKAD</div><div><b>2. Edge dan gateway</b>Analitik di tepi, konversi protokol</div><div><b>3. Platform UniTwin</b>Basis data, model digital twin, aturan dan prediksi</div><div><b>4. Aplikasi</b>Peta, denah, perangkat, anomali</div></div><div class="card" style="margin-top:14px"><table><thead><tr><th>Sistem</th><th>Data yang diambil</th><th>Protokol</th><th>Titik data</th><th>Status</th></tr></thead><tbody>'+C.map(c=>'<tr><td><b>'+c[0]+'</b></td><td>'+c[1]+'</td><td>'+c[2]+'</td><td>'+c[3]+'</td><td>'+pill('Terhubung (simulasi)','s-ok')+'</td></tr>').join('')+'</tbody></table></div>'+dasar()+'<div class="card" style="margin-top:14px"><h3>Privasi</h3>Video dan wajah tidak masuk UniTwin. Yang dikirim hanya jumlah orang dan jenis kejadian, dengan akses dibatasi dan retensi terbatas sesuai UU No. 27 Tahun 2022.</div>'}
+/* ===== Tampilan 3D (Three.js r128, model ilustratif) ===== */
+const Z={b:null,fl:0,ex:false,mode:'occ',rot:false},G={cp:[0,86,100],ct:[0,0,4],fly:false,bl:[],rooms:[],hover:null,ptr:null,night:0,ok:false,err:null};
+let W3=null;
+const PITCH=3.1,RH=2.7,BD=9.4,RDP=6.8;
+const bpos=f=>{const F=BM[f];return[(F[3]+F[8]/2-500)/10,(F[4]+59-280)/10]};
+function fly3(){const asp=G.w&&G.h?G.w/G.h:(window.innerWidth<768?window.innerWidth/(window.innerHeight*.62):1.1),k=Math.max(1,1.3/asp);if(Z.b){const p=bpos(Z.b),h=(Z.fl||NF(Z.b))*(PITCH+(Z.ex?4.2:0));G.cp=[p[0]+3,h*.6+14,p[1]+22+h*.6];G.ct=[p[0],h*.4,p[1]+1]}else{G.cp=[0,86,100];G.ct=[0,0,4]}G.cp=G.cp.map((v,i)=>G.ct[i]+(v-G.ct[i])*k);G.fly=true}
+function z3(k,v){Z[k]=v;if(k==='b'){Z.fl=0;Z.ex=false;SEL=null;fly3();G.hover=null;tip3(null)}if(k==='ex')fly3();render(true)}
+function view3d(b,f,id){Z.b=b;Z.fl=f||0;Z.ex=false;fly3();go('3d');if(id)sel(id)}
+function pickRoom(id){const r=RS.find(x=>x.id===id);if(Z.b!==r.fac){Z.b=r.fac;Z.ex=false;fly3()}if(Z.fl&&r.f>Z.fl)Z.fl=0;SEL=id;render(true)}
+function col3(r,s){
+ if(Z.mode==='dev')return s.bad?'#C8485E':s.an?'#D9A441':'#B9D8CB';
+ if(Z.mode==='ac')return s.ac==='RUSAK'?'#C8485E':s.waste?'#E58FA0':s.ac==='ON'?'#2E8B6E':'#C9CEDA';
+ return s.p==null?'#C9CEDA':s.waste?'#F2B8C4':occ(Math.min(1,s.p/r.cap*1.1))}
+function rr(x,a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath()}
+const FONT='Poppins,system-ui,Arial,sans-serif';
+function stc(s){return(s==='ON'||s==='ONLINE')?'#2E8B6E':(s==='OFF'?'#9AA3B6':'#C8485E')}
+function drawLabel(m){const r=m.userData.r,s=S[r.id],c=m.userData.cv,x=c.getContext('2d');x.clearRect(0,0,256,246);
+ rr(x,8,8,240,230,18);x.fillStyle='rgba(255,255,255,.8)';x.fill();x.textAlign='left';
+ x.fillStyle='#0B1630';x.font='700 34px '+FONT;x.fillText(r.id,22,50);
+ x.fillStyle='#6B7385';x.font='500 19px '+FONT;x.fillText(s.sched?s.sched.slice(0,19):'Tidak ada kelas',22,78);
+ x.fillStyle=s.p>r.cap?'#C8485E':'#0B1630';x.font='700 58px '+FONT;const t=s.p==null?'-':String(s.p);x.fillText(t,22,142);const w=x.measureText(t).width;
+ x.fillStyle='#6B7385';x.font='500 22px '+FONT;x.fillText('/ '+r.cap,22+w+8,142);
+ rr(x,22,154,212,10,5);x.fillStyle='#E4DCC8';x.fill();if(s.p!=null){rr(x,22,154,Math.max(10,Math.min(1,s.p/r.cap)*212),10,5);x.fillStyle=s.p>r.cap?'#C8485E':'#1F8FB8';x.fill()}
+ [['AC',s.ac],['TV',s.tv],['CCTV',s.cc]].forEach((d,i)=>{const px=22+i*72,wd=i===2?68:64;rr(x,px,184,wd,34,17);x.fillStyle=stc(d[1]);x.fill();x.fillStyle='#fff';x.font='700 18px '+FONT;x.textAlign='center';x.fillText(d[0]+((d[1]==='RUSAK'||d[1]==='OFFLINE')?'!':''),px+wd/2,207)});
+ m.userData.tx.needsUpdate=true}
+function drawTag(b,s){const c=b.tagCv,x=c.getContext('2d');x.clearRect(0,0,512,170);rr(x,6,6,500,150,28);x.fillStyle='rgba(11,22,48,.9)';x.fill();x.textAlign='left';
+ x.fillStyle='#fff';x.font='700 40px '+FONT;x.fillText(BM[b.fac][1].replace('Gedung ',''),26,60);x.fillStyle='#E8D9AE';x.font='500 30px '+FONT;x.fillText(s.p+' / '+s.cap+' orang',26,118);
+ let px=500;[[s.an,s.an+' anomali','#D9A441'],[s.bad,s.bad+' rusak','#C8485E']].forEach(d=>{if(d[0]){px-=124;rr(x,px,84,120,40,20);x.fillStyle=d[2];x.fill();x.fillStyle='#fff';x.font='700 22px '+FONT;x.textAlign='center';x.fillText(d[1],px+60,112);px-=0}});
+ b.tagTx.needsUpdate=true}
+function textSprite(t,sz,col){const c=document.createElement('canvas');c.width=512;c.height=128;const x=c.getContext('2d');x.textAlign='center';x.font='600 54px '+FONT;x.lineWidth=10;x.strokeStyle='rgba(255,255,255,.85)';x.strokeText(t,256,80);x.fillStyle=col||'#4A5570';x.fillText(t,256,80);
+ const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false}));sp.scale.set(sz*4,sz,1);return sp}
+function init3(){
+ if(typeof THREE==='undefined'||!THREE.OrbitControls)throw new Error('Three.js tidak termuat');
+ const R=G.R=new THREE.WebGLRenderer({antialias:true});const mob=window.innerWidth<768;R.setPixelRatio(Math.min(window.devicePixelRatio||1,mob?1.5:2));R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;
+ const sc=G.sc=new THREE.Scene();sc.background=new THREE.Color('#CFE6F5');sc.fog=new THREE.Fog('#CFE6F5',280,520);
+ fly3();G.fly=false;const cam=G.cam=new THREE.PerspectiveCamera(40,1,.5,800);cam.position.set(G.cp[0],G.cp[1],G.cp[2]);
+ const ctl=G.ctl=new THREE.OrbitControls(cam,R.domElement);ctl.target.set(G.ct[0],G.ct[1],G.ct[2]);ctl.enableDamping=true;ctl.dampingFactor=.08;ctl.maxPolarAngle=Math.PI/2-.03;ctl.minDistance=8;ctl.maxDistance=260;ctl.autoRotateSpeed=1.1;ctl.addEventListener('start',()=>{G.fly=false});
+ G.hemi=new THREE.HemisphereLight(0xffffff,0x9aa68e,1);sc.add(G.hemi);
+ const sun=G.sun=new THREE.DirectionalLight(0xffffff,1);sun.castShadow=true;sun.shadow.mapSize.set(mob?1024:2048,mob?1024:2048);const sh=sun.shadow.camera;sh.left=-78;sh.right=78;sh.top=62;sh.bottom=-62;sh.near=1;sh.far=300;sun.shadow.bias=-.0005;sc.add(sun);
+ const std=(c,o)=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.85,metalness:0},o||{})),box=(w,h,d,m,x,y,z,sh)=>{const e=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);e.position.set(x,y,z);e.castShadow=e.receiveShadow=sh!==false;return e};
+ /* tanah, plaza, parkir */
+ const gr=new THREE.Mesh(new THREE.PlaneGeometry(260,200),std('#9DB88C'));gr.rotation.x=-Math.PI/2;gr.receiveShadow=true;sc.add(gr);
+ sc.add(box(98,.12,11.6,std('#8E948F'),0,.06,-1.75,false));sc.add(box(96,.14,9.4,std('#D3D8CB'),0,.07,-1.75,false));
+ sc.add(box(98,.12,8.6,std('#8D919C'),0,.06,22.8,false));
+ const carC=['#C8485E','#1F8FB8','#F3F0E8','#16254A','#D9A441','#6B7385'].map(c=>std(c,{roughness:.5})),carG=new THREE.BoxGeometry(2.3,.9,1.2),cabG=new THREE.BoxGeometry(1.2,.6,1.05);
+ for(let row=0;row<2;row++)for(let i=0;i<24;i++){const k='car'+row+'_'+i;if(RN(k)<.38)continue;const x=-45+i*3.9,z=20.8+row*3.9,m=carC[Math.floor(RN(k+'c')*carC.length)],c=new THREE.Mesh(carG,m),d=new THREE.Mesh(cabG,m);c.position.set(x,.55,z);d.position.set(-.1,.75,0);c.add(d);c.castShadow=true;sc.add(c);for(const e of [c,d])e.receiveShadow=true}
+ /* fasilitas umum (posisi ilustratif) */
+ const mPub=std('#C9CEDA');G.pub={mats:[mPub],spr:[]};
+ const pub=(nm,mx,my,w,d,h,col,sz)=>{const m=col?std(col):mPub;if(col)G.pub.mats.push(m);const cx=(mx+w/2-500)/10,cz=(my+d/2-280)/10;sc.add(box(w/10,h,d/10,m,cx,h/2,cz));const sp=textSprite(nm,sz||2);sp.position.set(cx,h+2.2,cz);sc.add(sp);G.pub.spr.push(sp)};
+ pub('Perpustakaan Pusat',60,225,140,70,9.3);pub('KanBers',300,235,100,50,3.6,'#D9C9A5',1.8);pub('Rektorat',440,225,120,70,8);pub('Auditorium Bhinneka Tunggal Ika',620,225,150,70,7,null,1.7);
+ /* lapangan olahraga */
+ sc.add(box(19,.15,11.5,std('#7FA9C9'),37.5,.08,11,false));sc.add(box(.2,.17,10,std('#fff'),37.5,.1,11,false));sc.add(box(17,.17,.2,std('#fff'),37.5,.1,6.3,false));sc.add(box(17,.17,.2,std('#fff'),37.5,.1,15.7,false));
+ const lp=textSprite('Lapangan olahraga',1.8);lp.position.set(37.5,3.2,11);sc.add(lp);G.pub.spr.push(lp);
+ sc.add(box(20,.6,1.6,std('#0B1630'),0,2.6,18.2));sc.add(box(.8,2.6,.8,std('#0B1630'),-10,1.3,18.2));sc.add(box(.8,2.6,.8,std('#0B1630'),10,1.3,18.2));const gt=textSprite('Gerbang Jl. RS Fatmawati',1.7);gt.position.set(0,4.7,18.2);sc.add(gt);
+ const pk=textSprite('Area parkir',2);pk.position.set(0,2.2,26);sc.add(pk);G.pub.spr.push(gt,pk);
+ /* pohon */
+ const tg=new THREE.CylinderGeometry(.25,.35,1.8,6),fg=new THREE.ConeGeometry(1.6,3.6,8),tm=std('#7A5C3E'),fm=[std('#3F8A56'),std('#4C9A5F'),std('#2F7448')];
+ const tree=(x,z,i)=>{const s=.8+RN('t'+i)*.7,t=new THREE.Mesh(tg,tm),f=new THREE.Mesh(fg,fm[i%3]);t.position.set(x,.9*s,z);f.position.set(x,(1.8+1.7)*s,z);t.scale.setScalar(s);f.scale.setScalar(s);t.castShadow=f.castShadow=true;sc.add(t,f)};
+ let ti=0;for(let x=-46;x<=46;x+=7)tree(x,-27+RN('tx'+x)*2,ti++);for(const x of[-52,52])for(let z=-18;z<=16;z+=8)tree(x,z+RN('tz'+x+z)*2,ti++);
+ for(const x of[-58,58])for(let z=-26;z<=26;z+=13)tree(x,z,ti++);
+ /* gedung kuliah */
+ const mEdge=new THREE.LineBasicMaterial({color:0x0B1630,transparent:true,opacity:.28}),
+  gMk=new THREE.OctahedronGeometry(.42),gMa=new THREE.ConeGeometry(.42,.9,4),mMr=new THREE.MeshBasicMaterial({color:0xC8485E}),mMa=new THREE.MeshBasicMaterial({color:0xD9A441});
+ G.mk={gMk,gMa,mMr,mMa};
+ FAC.forEach(F=>{const fac=F[0],nf=F[5].length,bw=F[8]/10,p=bpos(fac),grp=new THREE.Group();grp.position.set(p[0],.25,p[1]);
+  const area=bw-3.6,sw=area/3,rw=sw-.25,gRoom=new THREE.BoxGeometry(rw,RH,RDP),gEdge=new THREE.EdgesGeometry(gRoom),gLab=new THREE.PlaneGeometry(rw-.15,RDP-.15);
+  const b={fac,nf,grp,floors:[],rooms:[],mats:[],gLab},mSlab=std('#D9D3C0'),mCore=std('#E8E1CC'),mRoof=std('#A9A28D'),mBase=std('#B8B3A4');b.mats.push(mSlab,mCore,mRoof,mBase);
+  grp.add(box(bw+1.2,.3,BD+1.2,mBase,0,-.15,0));
+  for(let f=1;f<=nf;f++){const fl=new THREE.Group();fl.position.y=(f-1)*PITCH;fl.userData.ty=(f-1)*PITCH;
+   fl.add(box(bw,.3,BD,mSlab,0,.15,0));fl.add(box(1.8,RH,BD,mCore,-(bw/2-.9),.3+RH/2,0));fl.add(box(1.8,RH,BD,mCore,bw/2-.9,.3+RH/2,0));
+   RS.filter(r=>r.fac===fac&&r.f===f).forEach((r,i)=>{const mt=std('#fff',{roughness:.7}),m=new THREE.Mesh(gRoom,mt);
+    m.position.set(-area/2+i*sw+sw/2,.3+RH/2,-BD/2+RDP/2);m.castShadow=m.receiveShadow=true;m.userData={r,fac,id:r.id};
+    const ed=new THREE.LineSegments(gEdge,mEdge);m.add(ed);m.userData.ed=ed;
+    const mk=new THREE.Mesh(gMk,mMr);mk.position.y=RH/2+1.2;mk.visible=false;m.add(mk);m.userData.mk=mk;
+    fl.add(m);b.rooms.push(m);G.rooms.push(m);b.mats.push(mt)});
+   grp.add(fl);b.floors.push(fl)}
+  const roof=b.roof=box(bw+.8,.4,BD+.8,mRoof,0,nf*PITCH+.2,0);grp.add(roof);
+  const tc=b.tagCv=document.createElement('canvas');tc.width=512;tc.height=170;b.tagTx=new THREE.CanvasTexture(tc);const tag=b.tag=new THREE.Sprite(new THREE.SpriteMaterial({map:b.tagTx,transparent:true,depthTest:false}));tag.scale.set(12,4,1);tag.position.y=nf*PITCH+4;tag.userData.ty=nf*PITCH+4;tag.renderOrder=10;grp.add(tag);
+  sc.add(grp);G.bl.push(b)});
+ /* DOM */
+ W3=document.createElement('div');W3.id='w3';W3.appendChild(R.domElement);
+ W3.insertAdjacentHTML('beforeend','<div class="w3o" id="w3c"></div><div class="w3o r" id="w3t"></div><div class="w3o hint"><span class="d">Seret: putar | Scroll: zoom | Klik kanan + seret: geser | Klik gedung atau ruang untuk detail</span><span class="m">1 jari: putar | 2 jari: zoom dan geser | Ketuk gedung atau ruang untuk detail</span></div><div id="w3tip"></div>');
+ const el=R.domElement,ray=G.ray=new THREE.Raycaster();
+ const setPtr=e=>{const r=el.getBoundingClientRect();G.ptr=new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);G.px=[e.clientX-r.left,e.clientY-r.top];G.dirty=e.pointerType!=='touch'};
+ el.addEventListener('pointermove',setPtr);
+ el.addEventListener('pointerleave',()=>{G.ptr=null;G.hover=null;G.dirty=false;tip3(null)});
+ el.addEventListener('pointerdown',e=>{G.dn=[e.clientX,e.clientY]});
+ el.addEventListener('pointerup',e=>{if(G.dn&&e.button===0&&Math.hypot(e.clientX-G.dn[0],e.clientY-G.dn[1])<5){setPtr(e);const m=ray3();if(m){if(Z.b!==m.userData.fac)z3('b',m.userData.fac);else sel(m.userData.id)}}G.dn=null});
+ G.ro=new ResizeObserver(resize3);G.ro.observe(W3);
+ G.clock=new THREE.Clock();requestAnimationFrame(loop3)}
+function ray3(){if(!G.ptr)return null;G.ray.setFromCamera(G.ptr,G.cam);const h=G.ray.intersectObjects(G.rooms.filter(m=>m.parent.visible),false);return h.length?h[0].object:null}
+function tip3(m){const t=document.getElementById('w3tip');if(!t)return;if(!m){t.style.display='none';return}
+ const r=m.userData.r,s=S[r.id];let h;
+ if(Z.b!==r.fac){const a=agg().b[r.fac];h='<b>'+BM[r.fac][1]+'</b><br>'+BM[r.fac][6]+'<br>'+a.p+' / '+a.cap+' orang | '+a.bad+' rusak | '+a.an+' anomali<br><i>Klik untuk masuk gedung</i>'}
+ else h='<b>'+r.id+'</b> | Lantai '+r.f+'<br>'+(s.sched||'Tidak ada kelas')+'<br>'+(s.p==null?'CCTV offline':s.p+' / '+r.cap+' orang')+'<br>AC '+s.ac+' | TV '+s.tv+' | CCTV '+s.cc+(s.an?'<br><b style="color:#E8C070">'+s.an+'</b>':'');
+ t.innerHTML=h;t.style.display='block';const w=W3.clientWidth;t.style.left=Math.min(G.px[0]+14,w-250)+'px';t.style.top=(G.px[1]+14)+'px'}
+function resize3(){if(!W3||!G.R)return;const w=W3.clientWidth,h=W3.clientHeight;if(!w||!h||(G.w===w&&G.h===h))return;G.w=w;G.h=h;G.R.setSize(w,h,false);G.cam.aspect=w/h;G.cam.updateProjectionMatrix()}
+function ensureLabels(b){if(b.lab)return;b.lab=true;b.rooms.forEach(m=>{const cv=document.createElement('canvas');cv.width=256;cv.height=246;const tx=new THREE.CanvasTexture(cv);tx.anisotropy=4;
+ const l=new THREE.Mesh(b.gLab,new THREE.MeshBasicMaterial({map:tx,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));l.rotation.x=-Math.PI/2;l.position.y=RH/2+.03;l.visible=false;m.add(l);m.userData.lab=l;m.userData.cv=cv;m.userData.tx=tx})}
+function sync3(){if(!G.ok)return;const A=agg();
+ /* matahari mengikuti jam simulasi */
+ const t=Math.min(1,Math.max(0,(T-340)/760)),k=Math.pow(Math.sin(Math.PI*t),.55);G.night=1-k;
+ const night=new THREE.Color('#1B2A52'),warm=new THREE.Color('#F2C9A0'),day=new THREE.Color('#CFE6F5'),bg=k<.35?night.clone().lerp(warm,k/.35):warm.clone().lerp(day,(k-.35)/.65);
+ G.sc.background.copy(bg);G.sc.fog.color.copy(bg);G.sun.position.set(Math.cos(Math.PI*t)*75,12+Math.sin(Math.PI*t)*62,26);G.sun.intensity=.1+.5*k;G.sun.color.set('#FFC48A').lerp(new THREE.Color('#FFFFFF'),Math.pow(k,.6));G.hemi.intensity=.38+.2*k;
+ G.ctl.autoRotate=Z.rot;
+ {const dp=Z.b!==null;G.pub.mats.forEach(m=>{if(m.userData.dim!==dp){m.userData.dim=dp;m.transparent=dp;m.opacity=dp?.2:1;m.depthWrite=!dp;m.needsUpdate=true}});G.pub.spr.forEach(x=>{x.visible=!dp})}
+ G.bl.forEach(b=>{const foc=Z.b===b.fac,dim=Z.b!==null&&!foc,top=foc&&Z.fl?Z.fl:b.nf,s=A.b[b.fac],ex=foc&&Z.ex;
+  b.floors.forEach((fg,i)=>{const f=i+1;fg.visible=!(foc&&f>top);fg.userData.ty=(f-1)*(PITCH+(ex?4.2:0))});
+  b.roof.visible=!foc;
+  if(foc)ensureLabels(b);
+  b.mats.forEach(m=>{if(m.userData.dim!==dim){m.userData.dim=dim;m.transparent=dim;m.opacity=dim?.2:1;m.depthWrite=!dim;m.needsUpdate=true}});
+  b.rooms.forEach(m=>{const r=m.userData.r,st=S[r.id],fv=m.parent.visible;m.material.color.set(col3(r,st));m.userData.ed.visible=!dim;
+   const issue=st.bad||st.an,show=foc&&fv&&issue&&(r.f===top||ex);m.userData.mk.visible=!!show;if(show){m.userData.mk.geometry=st.bad?G.mk.gMk:G.mk.gMa;m.userData.mk.material=st.bad?G.mk.mMr:G.mk.mMa}
+   const lb=m.userData.lab;if(lb){lb.visible=foc&&fv;if(foc&&fv)drawLabel(m)}});
+  b.tag.visible=!dim;b.tag.scale.set(foc?8:12,foc?2.67:4,1);b.tag.userData.ty=(foc?top*PITCH+(ex?(top-1)*4.2:0):b.nf*PITCH)+4;drawTag(b,s)});
+ document.getElementById('w3c').textContent='Kampus Pondok Labu'+(Z.b?'  >  '+BM[Z.b][1]+(Z.fl?'  >  s.d. lantai '+Z.fl:''):'');
+ document.getElementById('w3t').textContent='Jam simulasi '+hm(T)}
+function loop3(){requestAnimationFrame(loop3);if(V!=='3d'||!W3||!W3.isConnected)return;
+ const cam=G.cam,ct=G.ctl,tm=G.clock.getElapsedTime();
+ if(G.fly){const e=.07;for(let i=0;i<3;i++){cam.position.setComponent(i,cam.position.getComponent(i)+(G.cp[i]-cam.position.getComponent(i))*e);ct.target.setComponent(i,ct.target.getComponent(i)+(G.ct[i]-ct.target.getComponent(i))*e)}
+  if(Math.abs(cam.position.x-G.cp[0])+Math.abs(cam.position.y-G.cp[1])+Math.abs(cam.position.z-G.cp[2])<.1)G.fly=false}
+ ct.update();
+ if(G.dirty){G.dirty=false;const h=ray3();if(h!==G.hover){G.hover=h}tip3(h);G.R.domElement.style.cursor=h?'pointer':'grab'}
+ G.bl.forEach(b=>{b.floors.forEach(fg=>{fg.position.y+=(fg.userData.ty-fg.position.y)*.14});b.tag.position.y+=(b.tag.userData.ty-b.tag.position.y)*.14;
+  b.rooms.forEach(m=>{const mt=m.material,sel=SEL===m.userData.id,hv=G.hover===m;
+   if(sel||hv){mt.emissive.set('#B8902F');mt.emissiveIntensity=sel?.6:.3}else{mt.emissive.copy(mt.color);mt.emissiveIntensity=G.night*.5}
+   const mk=m.userData.mk;if(mk.visible){mk.rotation.y=tm*2;mk.position.y=RH/2+1.2+Math.sin(tm*3+m.position.x)*.15}})});
+ G.R.render(G.sc,cam)}
+function attach3d(){const sl=document.getElementById('w3slot');if(!sl)return;
+ if(!G.ok&&!G.err){try{init3();G.ok=true}catch(e){G.err=e;console.error(e)}}
+ if(G.err){sl.innerHTML='<div class="lead" style="padding:28px">Tampilan 3D tidak dapat dimuat. Pastikan perangkat terhubung ke internet (pustaka Three.js dimuat dari CDN) dan browser mendukung WebGL.</div>';return}
+ sl.appendChild(W3);resize3();sync3()}
+function legend3(){const sw=(c,l)=>'<span><i style="background:'+c+'"></i>'+l+'</span>';
+ if(Z.mode==='dev')return sw('#C8485E','ada perangkat rusak / offline')+sw('#D9A441','ada anomali')+sw('#B9D8CB','normal');
+ if(Z.mode==='ac')return sw('#2E8B6E','AC menyala')+sw('#C9CEDA','AC mati')+sw('#E58FA0','AC menyala di ruang kosong')+sw('#C8485E','AC rusak');
+ return sw(occ(0),'kosong')+sw(occ(1),'penuh')+sw('#F2B8C4','AC menyala di ruang kosong')+sw('#C9CEDA','CCTV offline')}
+function v3(){const a=agg(),s=Z.b?a.b[Z.b]:a,F=Z.b?BM[Z.b]:null,n=Z.b?RS.filter(r=>r.fac===Z.b).length:RS.length;
+ const ch=(on,fn,l)=>'<button class="'+(on?'on':'')+'" onclick="'+fn+'">'+l+'</button>',lab=t=>'<div class="lead" style="margin:6px 0 6px">'+t+'</div>';
+ const cb=ch(!Z.b,"z3('b',null)",'Seluruh kampus')+FAC.map(f=>ch(Z.b===f[0],"z3('b','"+f[0]+"')",f[0])).join('');
+ const cf=Z.b?ch(!Z.fl,"z3('fl',0)",'Semua lantai')+Array.from({length:NF(Z.b)},(_,i)=>i+1).map(f=>ch(Z.fl===f,"z3('fl',"+f+")",'s.d. L'+f)).join('')+ch(Z.ex,"z3('ex',"+!Z.ex+")",'Pisah lantai'):'<span class="lead" style="margin:0">Pilih gedung untuk memotong dan memisahkan lantai.</span>';
+ const cm=[['occ','Keterisian'],['dev','Perangkat'],['ac','AC dan energi']].map(m=>ch(Z.mode===m[0],"z3('mode','"+m[0]+"')",m[1])).join('');
+ const T1=(k,v)=>'<tr><td>'+k+'</td><td><b>'+v+'</b></td></tr>';
+ const sum='<div class="card"><h3>'+(Z.b?F[1]+' | '+F[9]+(F[7]?'':' (asumsi)'):'Ringkasan kampus')+'</h3><table>'+T1('Orang (CCTV)',s.p+' / '+s.cap+' ('+Math.round(s.p/s.cap*100)+'%)')+T1('Ruang terpakai',s.used+' / '+n)+T1('Perangkat bermasalah',s.bad)+T1('Anomali aktif',s.an)+T1('AC boros',s.waste+' ruang, '+idr(s.waste*KW*TARIF)+'/jam')+'</table></div>';
+ const P=RS.filter(r=>(!Z.b||r.fac===Z.b)&&(S[r.id].an||S[r.id].bad||S[r.id].waste)).map(r=>{const x=S[r.id],dv=[x.ac==='RUSAK'?'AC rusak':'',x.tv==='RUSAK'?'TV rusak':'',x.cc==='OFFLINE'?'CCTV offline':''].filter(Boolean).join(', ');
+  return[x.an?0:(x.bad?1:2),'<div class="al'+(x.an?'':x.bad?' w':' g')+'" style="cursor:pointer" onclick="pickRoom(\''+r.id+'\')"><b>'+r.id+'</b> '+(x.an||dv||'AC menyala, ruang kosong')+(x.an&&dv?' | '+dv:'')+'</div>']}).sort((p,q)=>p[0]-q[0]);
+ const pl='<div class="card"><h3>Ruang perlu perhatian ('+P.length+')</h3>'+(P.slice(0,7).map(x=>x[1]).join('')||'<div class="lead">Tidak ada peringatan.</div>')+(P.length>7?'<div class="lead" style="margin:0">dan '+(P.length-7)+' lainnya</div>':'')+'</div>';
+ const rm=SEL?RS.find(x=>x.id===SEL):null;
+ const dt='<div class="card dt'+(rm?' has':'')+'">'+(rm?detail()+'<div style="margin-top:8px"><a class="lnk" onclick="go(\'denah\',\''+rm.fac+'\','+rm.f+');sel(\''+rm.id+'\')">Buka di denah 2D</a></div>':'<div class="lead">Klik sebuah ruang pada model 3D untuk melihat detail perangkat dan jumlah orang.</div>')+'</div>';
+ return head('Tampilan 3D','Model 3D Kampus Pondok Labu dengan data yang sama. Klik gedung untuk masuk, lalu potong atau pisahkan lantai untuk melihat isi tiap ruang.')+
+ '<div class="two"><div class="card" style="padding:10px"><div id="w3slot"></div><div class="leg">'+legend3()+'<span>Belah ketupat merah = perangkat rusak, piramida kuning = anomali</span></div></div><div class="side"><div class="card"><h3>Kontrol tampilan</h3>'+lab('Gedung')+'<div class="chips">'+cb+'</div>'+lab('Lantai')+'<div class="chips">'+cf+'</div>'+lab('Warna ruang')+'<div class="chips">'+cm+'</div><div class="chips" style="margin:0">'+ch(Z.rot,"z3('rot',"+!Z.rot+")",'Putar otomatis')+ch(false,'fly3()','Reset kamera')+'</div></div>'+sum+pl+dt+'</div></div>'}
+function dasar(){return'<div class="card" style="margin-top:14px"><h3>Dasar data Kampus Pondok Labu (UPNVJ)</h3><div class="lead">Prototipe memodelkan kampus utama (Kampus I, Jl. RS Fatmawati No. 1, Cilandak, Jakarta Selatan): 71 ruang kuliah menurut data resmi UPNVJ. Nama gedung diambil dari sumber resmi; hal lain yang belum dipublikasikan ditandai asumsi dan dapat diubah di tabel <code>FAC</code> pada kode.</div><table><thead><tr><th>Gedung</th><th>Fakultas di model</th><th>Lantai</th><th>Ruang kelas</th><th>Status data</th></tr></thead><tbody>'+FAC.map(F=>'<tr><td><b>'+F[1]+'</b></td><td>'+F[6]+'</td><td>'+F[5].length+'</td><td>'+F[5].reduce((n,x)=>n+x,0)+'</td><td>'+(F[7]?pill('Sesuai laman resmi','s-ok'):pill('Fakultas asumsi','Sedang'))+'</td></tr>').join('')+'</tbody></table><div class="lead" style="margin-top:8px">Jumlah ruang per gedung diatur agar total = '+RS.length+'. Posisi gedung pada peta ilustratif. Fakultas Ilmu Kesehatan, Teknik, dan gedung Kedokteran MERce berada di Kampus Limo, Depok, dan belum dimodelkan. Gedung Cipto Mangunkusumo dikaitkan dengan FK dari laman lama FK UPNVJ, jadi perlu dikonfirmasi.</div></div>'}
 function render(keep){calc();document.getElementById('nav').innerHTML=NAV.map(n=>'<button class="'+(n[0]===V?'on':'')+'" onclick="go(\''+n[0]+'\')">'+n[1]+'</button>').join('');document.getElementById('clk').textContent=hm(T);
- const sy=window.scrollY;document.getElementById('m').innerHTML=({peta:vPeta,denah:vDenah,perangkat:vPerangkat,anomali:vAnomali,integrasi:vIntegrasi})[V]();if(keep)window.scrollTo(0,sy)}
+ const sy=window.scrollY;document.getElementById('m').innerHTML=({peta:vPeta,'3d':v3,denah:vDenah,perangkat:vPerangkat,anomali:vAnomali,integrasi:vIntegrasi})[V]();document.querySelectorAll('#m table').forEach(t=>{if(t.tHead)t.classList.add('wt')});if(V==='3d')attach3d();if(keep)window.scrollTo(0,sy)}
 document.getElementById('sl').oninput=e=>{T=+e.target.value;render(true)};
 document.getElementById('pl').onclick=e=>{if(play){clearInterval(play);play=null;e.target.textContent='Putar'}else{e.target.textContent='Jeda';play=setInterval(()=>{T=T>=1200?360:T+10;document.getElementById('sl').value=T;render(true)},1200)}};
 setInterval(()=>{if(!play){tick++;render(true)}},8000);
-function fromHash(){const h=(location.hash||'').slice(1).split('/');if(NAV.some(n=>n[0]===h[0])&&(h[0]!==V||(h[1]&&h[1]!==B)||(h[2]&&+h[2]!==FL))){V=h[0];if(h[1])B=h[1];if(h[2])FL=+h[2];SEL=null;render()}}
+function fromHash(){const h=(location.hash||'').slice(1).split('/');if(NAV.some(n=>n[0]===h[0])&&(h[0]!==V||(h[1]&&h[1]!==B)||(h[2]&&+h[2]!==FL))){V=h[0];if(h[1]&&BM[h[1]])B=h[1];if(h[2])FL=+h[2];SEL=null;render()}}
 window.addEventListener('hashchange',fromHash);fromHash();render();
 </script>
 </body>

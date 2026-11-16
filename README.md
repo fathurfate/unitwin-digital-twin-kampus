@@ -19,19 +19,34 @@ pengelola dapat melihat isi tiap kelas, perangkat yang rusak, ruang yang boros l
 
 | Menu | Isi |
 | --- | --- |
-| Peta Kampus | Denah kampus 2D, warna gedung = tingkat keterisian, ringkasan (orang, ruang terpakai, perangkat bermasalah, anomali, AC boros) |
-| Denah Gedung | Tampak depan gedung 4 lantai, denah per lantai, jumlah orang per kelas, status AC/TV/CCTV, detail ruang, pembuatan tiket perbaikan |
+| Peta Kampus | Denah Kampus Pondok Labu UPNVJ 2D (7 gedung kuliah, Perpustakaan Pusat, Rektorat, Auditorium Bhinneka Tunggal Ika, KanBers, lapangan, parkir), warna gedung = tingkat keterisian, ringkasan (orang, ruang terpakai, perangkat bermasalah, anomali, AC boros) |
+| Tampilan 3D | Model 3D kampus (Three.js): orbit, zoom, geser kamera; klik gedung untuk masuk, potong atau pisahkan lantai, tiga mode warna (keterisian, perangkat, AC dan energi), kartu info tiap ruang, marka perangkat rusak dan anomali, matahari mengikuti jam simulasi |
+| Denah Gedung | Tampak depan gedung (2 atau 4 lantai), denah per lantai, jumlah orang per kelas, status AC/TV/CCTV, detail ruang, pembuatan tiket perbaikan |
 | Perangkat dan Kerusakan | Daftar AC, TV, CCTV dengan filter, kode error, tautan ke denah |
 | Anomali CCTV | Kerumunan melebihi kapasitas, gerakan tidak wajar, aktivitas di luar jadwal |
 | Integrasi Sistem | Alur sistem kampus, gateway, platform, aplikasi, dan catatan privasi |
 
-Slider **jam simulasi** mengubah isi kelas sepanjang hari (06.00 sampai 20.00).
+Slider **jam simulasi** mengubah isi kelas sepanjang hari (06.00 sampai 20.00). Di tampilan 3D, jam yang sama juga menggerakkan matahari dan mengubah warna langit.
+
+### Cara memakai tampilan 3D
+
+- **Seret** untuk memutar, **scroll** untuk zoom, **klik kanan + seret** untuk menggeser.
+- **Klik gedung** untuk masuk. Lalu pilih *s.d. L1..L4* untuk memotong lantai atas, atau *Pisah lantai* untuk memisahkan tiap lantai.
+- **Klik ruang** untuk detail AC, TV, CCTV, jumlah orang, dan tombol buat tiket. Daftar *Ruang perlu perhatian* juga bisa diklik.
+- Dari menu Denah Gedung, tombol **Lihat 3D** membuka gedung dan lantai yang sama.
+
+### Di handphone
+
+Tampilan menyesuaikan layar kecil: menu geser di bagian atas, slider jam simulasi ringkas, kartu ringkasan 2 kolom, peta dan denah lantai bisa digeser ke samping, tabel bisa digulir. Di model 3D: **1 jari** memutar, **2 jari** zoom dan geser, **ketuk** gedung atau ruang untuk detail (kartu detail muncul tepat di bawah model). Resolusi dan bayangan 3D diturunkan otomatis di layar kecil agar tetap ringan.
 
 ## Tampilan
 
 ![Peta Kampus](docs/screenshots/01-peta-kampus.png)
+![Tampilan 3D, seluruh kampus](docs/screenshots/07-tampilan-3d-kampus.png)
+![Tampilan 3D, masuk ke gedung](docs/screenshots/08-tampilan-3d-gedung.png)
 ![Denah Gedung](docs/screenshots/02-denah-gedung.png)
 ![Perangkat dan Kerusakan](docs/screenshots/03-perangkat-kerusakan.png)
+<img src="docs/screenshots/09-tampilan-hp.png" width="320" alt="Tampilan di handphone">
 ![Anomali CCTV](docs/screenshots/04-anomali-cctv.png)
 
 ## Arsitektur
@@ -45,7 +60,7 @@ Slider **jam simulasi** mengubah isi kelas sepanjang hari (06.00 sampai 20.00).
 
 ## Cara menjalankan
 
-Prototipe berjalan penuh di browser, tanpa server dan tanpa database.
+Prototipe berjalan penuh di browser, tanpa server dan tanpa database. Menu **Tampilan 3D** memuat pustaka Three.js dari CDN (jsDelivr), jadi perlu koneksi internet dan browser yang mendukung WebGL; menu lainnya tidak bergantung pada pustaka itu.
 
 **Cara 1, buka langsung.** Unduh repositori lalu klik dua kali `docs/index.html`.
 
@@ -66,10 +81,10 @@ unitwin-digital-twin-kampus/
 ├── .gitignore
 ├── apps-script/
 │   ├── Code.gs            doGet (menyajikan halaman) dan doPost (contoh penerima data gateway)
-│   ├── Index.html         salinan aplikasi untuk Apps Script
+│   ├── Index.html         salinan aplikasi untuk Apps Script (termasuk tampilan 3D)
 │   └── appsscript.json    manifest (zona waktu Asia/Jakarta, web app)
 └── docs/
-    ├── index.html         aplikasi utama (juga sumber GitHub Pages)
+    ├── index.html         aplikasi utama, termasuk tampilan 3D (juga sumber GitHub Pages)
     └── screenshots/       tangkapan layar dan diagram arsitektur
 ```
 
@@ -106,7 +121,23 @@ Ganti fungsi `st(r)` agar membaca data dari gateway UniTwin. Format yang diharap
 
 ## Batasan
 
-- Data simulasi, denah ilustratif.
+- Data simulasi, denah dan model 3D ilustratif (bentuk gedung hanya blok, bukan model resmi).
+
+## Dasar data kampus UPNVJ
+
+Model memakai **Kampus I Pondok Labu** (Jl. RS Fatmawati No. 1, Jakarta Selatan) dengan total **71 ruang kuliah** sesuai data resmi UPNVJ. Isi tabel `FAC` di `docs/index.html` bisa diubah kalau ada data yang lebih akurat.
+
+| Gedung | Fakultas di model | Lantai | Ruang | Status |
+|---|---|---|---|---|
+| Ki Hajar Dewantara | Kuliah bersama (MKU) | 4 | 12 | fakultas asumsi |
+| Dr. Soetomo | FIK | 4 | 12 | fakultas asumsi |
+| Dr. Cipto Mangunkusumo | FK | 4 | 12 | asumsi, dari laman lama FK |
+| RA Kartini | Hukum S2 dan S3 | 2 | 3 | sesuai laman FH |
+| Moh. Husni Thamrin | FEB | 4 | 12 | fakultas asumsi |
+| Mr. Moh. Yamin | FISIP | 4 | 8 | fakultas asumsi |
+| Yos Sudarso | Fakultas Hukum | 4 | 12 | sesuai laman FH |
+
+Yang berasal dari sumber resmi: nama enam gedung kuliah (pengumuman UTBK-SNBT 2026 UPNVJ), Yos Sudarso dan RA Kartini sebagai gedung Fakultas Hukum beserta jumlah lantainya (laman fasilitas FH), Perpustakaan Pusat 3 lantai, dan total 71 ruang kuliah. Yang belum ada di sumber publik dan berstatus **asumsi**: pembagian fakultas ke gedung selain Hukum, posisi gedung pada peta, serta jumlah ruang per lantai. Kampus Limo (FIKES, Teknik, Kedokteran MERce) belum dimodelkan.
 - Angka penghematan dan biaya pada laporan adalah asumsi dan perlu divalidasi lewat pilot.
 - Kontrol otomatis AC belum diimplementasikan; tahap awal hanya rekomendasi.
 
